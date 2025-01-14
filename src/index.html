@@ -12,7 +12,12 @@
   <p><strong>curl example:</strong></p>
   <pre>
 curl -X POST -H "Content-Type: application/json" \
-     -d '{"name": "John", "age": 30}' \
+     -d '[
+  { "question": "Q1", "schema": "name", "answer": "A1" },
+  { "question": "Q2", "schema": "number", "answer": 2.5 },
+  { "question": "Q2", "schema": "boolean", "answer": true },
+  { "question": "Q2", "schema": "boolean", "answer": "n/a" }
+]' \
      http://localhost:8000/submit
   </pre>
 
@@ -22,7 +27,12 @@ import requests
 
 resp = requests.post(
     "http://localhost:8000/submit",
-    json={"name": "John", "age": 30}
+    json=[
+  { "question": "Q1", "schema": "name", "answer": "A1" },
+  { "question": "Q2", "schema": "number", "answer": 2.5 },
+  { "question": "Q2", "schema": "boolean", "answer": true },
+  { "question": "Q2", "schema": "boolean", "answer": "n/a" }
+]
 )
 print(resp.json())
   </pre>
@@ -31,11 +41,12 @@ print(resp.json())
   <!-- Simple form that posts JSON to /submit -->
   <form action="/submit" method="post">
     <label for="content">Submission JSON:</label><br><br>
-    <textarea id="content" name="content" rows="6" cols="60">
+    <textarea id="content" name="content" rows="7" cols="65">
 [
   { "question": "Q1", "schema": "name", "answer": "A1" },
   { "question": "Q2", "schema": "number", "answer": 2.5 },
-  { "question": "Q2", "schema": "boolean", "answer": true }
+  { "question": "Q2", "schema": "boolean", "answer": true },
+  { "question": "Q2", "schema": "boolean", "answer": "n/a" }
 ]
     </textarea><br><br>
     <input type="submit" value="Submit" />

@@ -4,7 +4,7 @@ import json
 import uuid
 import time
 
-from fastapi import FastAPI, Form
+from fastapi import FastAPI, Form, Body
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse, JSONResponse
 from typing import Optional, List, Union
@@ -29,13 +29,19 @@ class QuestionAnswer(BaseModel):
     @staticmethod
     def validate_answer(schema: Optional[str], answer: any):
         # TODO think about how to handle schema deviations (reject submission, try to fix it first)
-        if schema == "number" and not isinstance(answer, (int, float)):
-            raise ValueError(f"Expected a number for schema 'number', got: {type(answer).__name__}")
-        if schema == "name" and not isinstance(answer, str):
-            raise ValueError(f"Expected text for schema 'text', got: {type(answer).__name__}")
-        if schema == "boolean" and not isinstance(answer, bool):
-            # TODO handle boolean case (True vs. true, yes/no case)
-            raise ValueError(f"Expected text for schema 'text', got: {type(answer).__name__}")
+        if answer is None:
+            return 1
+        if isinstance(answer, str):
+            if answer.lower() == "n/a" or answer == "" or answer.lower == "na":
+                return 1
+        else:
+            if schema == "number" and not isinstance(answer, (int, float)):
+                raise ValueError(f"Expected a number for schema 'number', got: {type(answer).__name__}")
+            if schema == "name" and not isinstance(answer, str):
+                raise ValueError(f"Expected text for schema 'text', got: {type(answer).__name__}")
+            if schema == "boolean" and not isinstance(answer, bool):
+                # TODO handle boolean case (True vs. true, yes/no case)
+                raise ValueError(f"Expected text for schema 'text', got: {type(answer).__name__}")
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
@@ -88,15 +94,22 @@ def get_submissions():
 
 # TODO instead of json return, show fail/success in UI
 @app.post("/submit")
-def submit(content: str = Form(...)):
+def submit(content: str = Form(...), body: SubmissionSchema = Body(None)):
     """
     Submits data to the backend via a form or JSON.
     Validates, signs, and stores the submission.
     """
-    try:
-        submission = validate_submission(content)
-    except ValueError as e:
-        return {"error": str(e)}
+    if content:
+        try:
+            submission = validate_submission(content)
+        except ValueError as e:
+            return {"error": str(e)}
+    elif body:
+        # FIXME still not working via curl
+        print(body)
+        submission = body
+    else:
+        return {"error": "No input provided"}
 
     # Generate a signature
     submission_bytes = content.encode("utf-8")
