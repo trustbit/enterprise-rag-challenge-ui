@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8" />
+  <title>FastAPI Submit Example</title>
+  <!-- Link to the external stylesheet in /static -->
+  <link rel="stylesheet" href="static/style.css">
+</head>
+<body>
+  <h1>Submission API Usage</h1>
+
+  <p><strong>curl example:</strong></p>
+  <pre>
+curl -X POST -H "Content-Type: application/json" \
+     -d '{"name": "John", "age": 30}' \
+     http://localhost:8000/submit
+  </pre>
+
+  <p><strong>Python example:</strong></p>
+  <pre>
+import requests
+
+resp = requests.post(
+    "http://localhost:8000/submit",
+    json={"name": "John", "age": 30}
+)
+print(resp.json())
+  </pre>
+
+  <h2>Manual Submission</h2>
+  <!-- Simple form that posts JSON to /submit -->
+  <form action="/submit" method="post">
+    <label for="content">Submission JSON:</label><br><br>
+    <textarea id="content" name="content" rows="6" cols="60">
+[
+  { "question": "Q1", "schema": "name", "answer": "A1" },
+  { "question": "Q2", "schema": "number", "answer": 2.5 },
+  { "question": "Q2", "schema": "boolean", "answer": true }
+]
+    </textarea><br><br>
+    <input type="submit" value="Submit" />
+  </form>
+
+  <h2>Submissions</h2>
+  <!-- Table to display the submissions fetched via JavaScript -->
+  <table id="submissionsTable">
+      <thead>
+          <tr>
+              <th>Time</th>
+              <th>ID</th>
+              <th>Signature</th>
+          </tr>
+      </thead>
+      <tbody>
+      </tbody>
+  </table>
+
+  <script>
+    // Loads existing submissions from /submissions
+    async function loadSubmissions() {
+      const resp = await fetch("/submissions");
+      const data = await resp.json();
+
+      const tbody = document.querySelector("#submissionsTable tbody");
+      tbody.innerHTML = ""; // Clear out any old rows
+
+      data.forEach(entry => {
+        const row = document.createElement("tr");
+
+        // Time
+        const timeCell = document.createElement("td");
+        timeCell.textContent = entry.time;
+        row.appendChild(timeCell);
+
+        // ID
+        const idCell = document.createElement("td");
+        idCell.textContent = entry.id;
+        row.appendChild(idCell);
+
+        // Signature
+        const sigCell = document.createElement("td");
+        sigCell.textContent = entry.signature;
+        row.appendChild(sigCell);
+
+        tbody.appendChild(row);
+      });
+    }
+
+    // Load submissions once page is fully loaded
+    window.addEventListener("DOMContentLoaded", loadSubmissions);
+  </script>
+</body>
+</html>

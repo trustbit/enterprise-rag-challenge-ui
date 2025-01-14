@@ -1,0 +1,24 @@
+body {
+    font-family: Arial, sans-serif;
+    margin: 40px;
+}
+
+h1, h2 {
+    color: #333;
+}
+
+pre {
+    background-color: #f4f4f4;
+    padding: 10px;
+}
+
+form, table {
+    margin-top: 20px;
+    margin-bottom: 20px;
+}
+
+table, th, td {
+    border: 1px solid #ccc;
+    border-collapse: collapse;
+    padding: 8px;
+}
