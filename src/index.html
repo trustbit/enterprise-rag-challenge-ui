@@ -31,7 +31,7 @@
     </form>
 
     <h2>Submission via API</h2>
-    <p>Example with curl:</p>
+    <p>With curl:</p>
     <div class="code-container">
       <button class="copy-button" onclick="copyCode('curl-code')">
         Copy
@@ -45,7 +45,7 @@ curl -X 'POST' \
       </pre>
     </div>
 
-    <p>Example with Python requests (UNTESTED):</p>
+    <p>With Python requests:</p>
     <div class="code-container">
       <button class="copy-button" onclick="copyCode('python-code')">
         Copy
@@ -53,16 +53,19 @@ curl -X 'POST' \
       <pre id="python-code">
 import requests
 
-resp = requests.post(
-    "http://localhost:8000/submit",
-    json=[
-  { "question": "Q1", "schema": "name", "answer": "A1" },
-  { "question": "Q2", "schema": "number", "answer": 2.5 },
-  { "question": "Q2", "schema": "boolean", "answer": true },
-  { "question": "Q2", "schema": "boolean", "answer": "n/a" }
-]
-)
-print(resp.json())
+def main():
+    url = "http://127.0.0.1:8000/submit"
+    headers = {"accept": "application/json"}
+    files = {
+        "file": ("sample_answer.json", open(r"C:\Users\felix.krause\code\trustbit\enterprise-rag-challenge-ui\test\samples\sample_answer.json", "rb"), "application/json")
+    }
+    response = requests.post(url, headers=headers, files=files)
+    assert response.status_code == 200
+    print(response.json())
+
+if __name__ == "__main__":
+    main()
+
       </pre>
     </div>
 
