@@ -35,12 +35,14 @@ body {
       text-align: center;
       margin: 0;
       font-weight: 550;
+      font-size: 2rem;
     }
 
     h2 {
       color: #333;
       margin-top: 60px;
       font-weight: 450;
+      font-size: 1.5rem;
     }
 
     pre {
@@ -64,6 +66,14 @@ body {
       border: 1px solid #ccc;
       border-collapse: collapse;
       padding: 8px;
+    }
+
+    th {
+      font-size: 1rem;
+    }
+
+    td {
+      font-size: 0.8rem;
     }
 
     textarea {
