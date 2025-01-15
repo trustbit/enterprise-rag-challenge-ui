@@ -69,7 +69,6 @@ def validate_submission(content_str: str | bytes) -> SubmissionSchema:
         submission = SubmissionSchema(data=data)
     except (json.JSONDecodeError, ValidationError) as e:
         raise ValueError(f"Invalid JSON or schema: {e}")
-    # TODO Extra custom checks:
     return submission
 
 
@@ -149,9 +148,6 @@ async def submit(file: UploadFile):
         submission = validate_submission(content)  # Parse and validate form input
         response = process_submission(submission)
         return response
-
-        # # Process or store the validated data as needed
-        # return {"message": "JSON file successfully processed.", "items": len(validated_data)}
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"An error occurred: {str(e)}")
 
