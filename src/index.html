@@ -2,27 +2,44 @@
 <html>
 <head>
   <meta charset="UTF-8" />
-  <title>FastAPI Submit Example</title>
+  <title>RAG Challenge Submission API</title>
   <!-- Link to the external stylesheet in /static -->
   <link rel="stylesheet" href="static/style.css">
 </head>
 <body>
-  <h1>Submission API Usage</h1>
+  <div class="header">
+    <img src="static/ERC_header_8.png" alt="Logo">
+  </div>
 
-  <p><strong>curl example:</strong></p>
-  <pre>
-curl -X POST -H "Content-Type: application/json" \
-     -d '[
+  <div class="content">
+    <h1>Answer Submission</h1>
+
+    <h2>Manual Submission</h2>
+    <form action="/submit-ui" method="post">
+      <label for="content">Enter submission JSON:</label><br><br>
+      <textarea id="content" name="content" rows="7">
+[
   { "question": "Q1", "schema": "name", "answer": "A1" },
   { "question": "Q2", "schema": "number", "answer": 2.5 },
   { "question": "Q2", "schema": "boolean", "answer": true },
   { "question": "Q2", "schema": "boolean", "answer": "n/a" }
-]' \
-     http://localhost:8000/submit
-  </pre>
+]
+      </textarea><br><br>
+      <input type="submit" value="Check Submission" />
+    </form>
 
-  <p><strong>Python example:</strong></p>
-  <pre>
+    <h2>Submission via API</h2>
+    <p><strong>curl example:</strong></p>
+    <pre>
+curl -X 'POST' \
+  'http://127.0.0.1:8000/submit' \
+  -H 'accept: application/json' \
+  -H 'Content-Type: multipart/form-data' \
+  -F 'file=@test/samples/sample_answer.json;type=application/json'
+    </pre>
+
+    <p><strong>Python example (UNTESTED):</strong></p>
+    <pre>
 import requests
 
 resp = requests.post(
@@ -35,60 +52,41 @@ resp = requests.post(
 ]
 )
 print(resp.json())
-  </pre>
+    </pre>
 
-  <h2>Manual Submission</h2>
-  <!-- Simple form that posts JSON to /submit -->
-  <form action="/submit-ui" method="post">
-    <label for="content">Submission JSON:</label><br><br>
-    <textarea id="content" name="content" rows="7" cols="65">
-[
-  { "question": "Q1", "schema": "name", "answer": "A1" },
-  { "question": "Q2", "schema": "number", "answer": 2.5 },
-  { "question": "Q2", "schema": "boolean", "answer": true },
-  { "question": "Q2", "schema": "boolean", "answer": "n/a" }
-]
-    </textarea><br><br>
-    <input type="submit" value="Submit" />
-  </form>
-
-  <h2>Submissions</h2>
-  <!-- Table to display the submissions fetched via JavaScript -->
-  <table id="submissionsTable">
+    <h2>All Submissions</h2>
+    <table id="submissionsTable">
       <thead>
-          <tr>
-              <th>Time</th>
-              <th>ID</th>
-              <th>Signature</th>
-          </tr>
+        <tr>
+          <th>Time</th>
+          <th>ID</th>
+          <th>Signature</th>
+        </tr>
       </thead>
       <tbody>
       </tbody>
-  </table>
+    </table>
+  </div>
 
   <script>
-    // Loads existing submissions from /submissions
     async function loadSubmissions() {
       const resp = await fetch("/submissions");
       const data = await resp.json();
 
       const tbody = document.querySelector("#submissionsTable tbody");
-      tbody.innerHTML = ""; // Clear out any old rows
+      tbody.innerHTML = "";
 
       data.forEach(entry => {
         const row = document.createElement("tr");
 
-        // Time
         const timeCell = document.createElement("td");
         timeCell.textContent = entry.time;
         row.appendChild(timeCell);
 
-        // ID
         const idCell = document.createElement("td");
         idCell.textContent = entry.id;
         row.appendChild(idCell);
 
-        // Signature
         const sigCell = document.createElement("td");
         sigCell.textContent = entry.signature;
         row.appendChild(sigCell);
@@ -97,7 +95,6 @@ print(resp.json())
       });
     }
 
-    // Load submissions once page is fully loaded
     window.addEventListener("DOMContentLoaded", loadSubmissions);
   </script>
 </body>
