@@ -24,7 +24,7 @@
         <h2>Manual Submission</h2>
       </button>
       <div class="section-content">
-        <form action="/submit-ui" method="post">
+        <form id="submissionForm">
           <label for="content">Enter submission JSON:</label><br><br>
           <textarea id="content" name="content" rows="7">
 [
@@ -34,8 +34,10 @@
   { "question": "Q2", "schema": "boolean", "answer": "n/a" }
 ]
           </textarea><br><br>
-          <input type="submit" value="Check Submission" />
+          <button type="button" id="checkButton">Check Submission</button>
+          <button type="button" id="submitButton">Submit</button>
         </form>
+      <div id="validation-issues" style="color: red; margin-bottom: 10px;"></div>
       </div>
     </div>
 
@@ -121,7 +123,7 @@ if __name__ == "__main__":
       });
     });
 
-    // Copy code functionality
+    // Copy code buttons
     async function copyCode(elementId) {
       const codeElement = document.getElementById(elementId);
       const button = codeElement.parentElement.querySelector('.copy-button');
@@ -167,6 +169,46 @@ if __name__ == "__main__":
         tbody.appendChild(row);
       });
     }
+
+    // Adding submit and check button functionality
+    document.getElementById("checkButton").addEventListener("click", async () => {
+      const content = document.getElementById("content").value;
+      const response = await fetch("/check-submission", {
+        method: "POST",
+        headers: { "Content-Type": "application/x-www-form-urlencoded" },
+        body: new URLSearchParams({ content }),
+      });
+      const result = await response.json();
+      const issuesDiv = document.getElementById("validation-issues");
+
+      if (result.status === "issues") {
+        issuesDiv.innerHTML = "Validation issues detected:<br>" + result.issues.join("<br>  ");
+        issuesDiv.style.color = "red";
+      } else {
+        issuesDiv.textContent = "No validation issues detected.";
+        issuesDiv.style.color = "green";
+      }
+    });
+
+    document.getElementById("submitButton").addEventListener("click", async () => {
+      const content = document.getElementById("content").value;
+      const response = await fetch("/submit-ui", {
+        method: "POST",
+        headers: { "Content-Type": "application/x-www-form-urlencoded" },
+        body: new URLSearchParams({ content }),
+      });
+      const result = await response.json();
+      if (result.status === "issues") {
+        alert("Submission has issues:\n" + result.issues.join("\n"));
+      } else if (result.status === "success") {
+        alert("Submission successful!");
+        const banner = document.createElement("div");
+        banner.classList.add("success-banner");
+        banner.textContent = "Answers successfully submitted!";
+        document.body.insertBefore(banner, document.body.firstChild);
+      }
+      await loadSubmissions();
+    });
 
     window.addEventListener("DOMContentLoaded", () => {
       loadSubmissions();

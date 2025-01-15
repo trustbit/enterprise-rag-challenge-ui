@@ -1,19 +1,16 @@
-#!/usr/bin/env python3
-
+from fastapi import FastAPI, Form, HTTPException, UploadFile, Request
+from fastapi.responses import HTMLResponse, JSONResponse
+from fastapi.staticfiles import StaticFiles
+from fastapi.templating import Jinja2Templates
+from pydantic import BaseModel, ValidationError, Field
+from typing import Optional, List, Union
+import json
 import os
 import re
-import json
 import uuid
 import time
 import logging
 from dotenv import load_dotenv
-
-from fastapi import FastAPI, Form, HTTPException, UploadFile
-from fastapi.staticfiles import StaticFiles
-from fastapi.responses import FileResponse, JSONResponse
-from typing import Optional, List, Union
-from pydantic import BaseModel, ValidationError, Field
-import uvicorn
 
 app = FastAPI()
 load_dotenv()
@@ -23,9 +20,9 @@ if os.getenv("DEVELOPMENT"):
     logger = logging.getLogger(__name__)
     logging.basicConfig(filename='temp/debug.log', encoding='utf-8', level=logging.INFO)
 
-
 # Mount the static directory for serving CSS
 app.mount("/static", StaticFiles(directory="src/static"), name="static")
+templates = Jinja2Templates(directory="src/")
 
 # In-memory submission storage
 # TODO add a database connection here
@@ -45,59 +42,59 @@ class SubmissionSchema(BaseModel):
 
 
 def validate_questions(submission: SubmissionSchema):
-    if submission:
-        for true_item, submission_item in zip(true_questions, submission.data):
-            true = re.sub(r'[^A-Za-z0-9\s]', '', true_item["question"].lower())
-            submission = re.sub(r'[^A-Za-z0-9\s]', '', submission_item.question.lower())
-            if true != submission:
-                raise ValueError(f"Question mismatch: {submission_item.question} != {true_item['question']}")
-    else:
-        raise ValueError("Questions are missing")
+    issues = []
+    for idx, (true_item, submission_item) in enumerate(zip(true_questions, submission.data)):
+        true = re.sub(r'[^A-Za-z0-9\s]', '', true_item["question"].lower())
+        submitted = re.sub(r'[^A-Za-z0-9\s]', '', submission_item.question.lower())
+        if true != submitted:
+            issues.append(f"\n - List item {idx + 1}: Question mismatch: '{submission_item.question}' != '{true_item['question']}'")
+    return issues
 
 
 def validate_answer(schema: Optional[str], answer: any):
-    # TODO show warnings before submitting instead of error
     if answer is None:
-        return "n/a"
-    if isinstance(answer, str):
-        if answer.lower() == "n/a" or answer.lower() == "na" or answer == "":
-            return "n/a"
+        return "n/a", None
+    if isinstance(answer, str) and answer.lower() in ["n/a", "na", ""]:
+        return "n/a", None
     if schema == "number" and not isinstance(answer, (int, float)):
         try:
-            answer = float(answer)
+            return float(answer), None
         except ValueError:
-            raise ValueError(f"Expected a number for schema 'number', got: {type(answer).__name__}")
+            return answer, f"Expected a number for schema 'number', got: {type(answer).__name__}"
     if schema == "name" and not isinstance(answer, str):
-        raise ValueError(f"Expected text for schema 'name', got: {type(answer).__name__}")
+        return answer, f"Expected text for schema 'name', got: {type(answer).__name__}"
     if schema == "boolean":
-        if isinstance(answer, str):
-            if answer.lower() in ["true", "yes", "True"]:
-                return True
-            elif answer.lower() in ["false", "no", "False"]:
-                return False
-            else:
-                raise ValueError(f"Expected boolean for schema 'boolean', got: {type(answer).__name__}")
-        if not isinstance(answer, bool):
-            raise ValueError(f"Expected boolean for schema 'boolean', got: {type(answer).__name__}")
-    return answer
+        if isinstance(answer, str) and answer.lower() in ["true", "yes"]:
+            return True, None
+        elif isinstance(answer, str) and answer.lower() in ["false", "no"]:
+            return False, None
+        elif not isinstance(answer, bool):
+            return answer, f"Expected boolean for schema 'boolean', got: {type(answer).__name__}"
+    return answer, None
 
 
-def validate_submission(content: str | bytes) -> SubmissionSchema:
-    """Validate the string as JSON, check schema constraints, etc."""
+def validate_submission(content: str | bytes):
     try:
         data = json.loads(content)
         submission = SubmissionSchema(data=data)
+        question_issues = []
+        logger.info(f"CHECK_QUESTIONS: {os.getenv('CHECK_QUESTIONS')}")
 
         if os.getenv("CHECK_QUESTIONS") == "True":
-            validate_questions(submission)
+            question_issues = validate_questions(submission)
 
+        answer_issues = []
         for idx, item in enumerate(submission.data):
-            answer = validate_answer(item.schema, item.answer)
+            answer, issue = validate_answer(item.schema, item.answer)
             submission.data[idx].answer = answer
+            if issue:
+                issue = f"\n - List item {idx + 1}: {issue}"
+                answer_issues.append(issue)
+
+        return question_issues + answer_issues
 
     except (json.JSONDecodeError, ValidationError) as e:
-        raise ValueError(f"Invalid JSON or schema: {e}")
-    return submission
+        return [f"Invalid JSON or schema: {str(e)}"]
 
 
 def sign_with_timestamp_server(payload_bytes: bytes) -> str:
@@ -139,30 +136,27 @@ def process_submission(submission: SubmissionSchema) -> dict:
     submissions_db.append(record)
 
     return {
-        "message": "Submission stored",
+        "message": "Submission stored successfully",
         "id": submission_id,
         "signature": signature,
         "time": now_str,
-        "data": submission.model_dump()["data"],
+        # "data": submission.model_dump()["data"],
     }
 
 
-@app.get("/")
-def serve_index():
-    """Return the main HTML page."""
-    return FileResponse("src/index.html")
+@app.get("/", response_class=HTMLResponse)
+async def serve_index(request: Request):
+    return templates.TemplateResponse("index.html", {"request": request})
 
 
-@app.get("/submissions")
-def get_submissions():
-    """
-    Return all submissions as JSON so the frontend can dynamically
-    load them and populate the table.
-    """
-    return JSONResponse(submissions_db)
+@app.post("/check-submission")
+async def check_submission(content: str = Form(...)):
+    issues = validate_submission(content)
+    if issues:
+        return {"status": "issues", "issues": issues}
+    return {"status": "valid"}
 
 
-# TODO instead of json return, show fail/success in UI
 @app.post("/submit")
 async def submit(file: UploadFile):
     try:
@@ -181,17 +175,20 @@ async def submit(file: UploadFile):
 
 
 @app.post("/submit-ui")
-def submit_ui(content: str = Form(...)):
-    """
-    Endpoint for submitting data via an HTML form.
-    """
-    try:
-        submission = validate_submission(content)  # Parse and validate form input
-        response = process_submission(submission)
-        return response
-    except ValueError as e:
-        raise HTTPException(status_code=400, detail=f"Invalid form data: {str(e)}")
+async def submit_ui(content: str = Form(...)):
+    issues = validate_submission(content)
+    if issues:
+        return {"status": "issues", "issues": issues}
+    submission = SubmissionSchema(data=json.loads(content))
+    response = process_submission(submission)
+    return {"status": "success", "message": response}
 
 
-if __name__ == "__main__":
-    uvicorn.run("main:app", host="0.0.0.0", port=8000, reload=True)
+@app.get("/submissions")
+def get_submissions():
+    """
+    Return all submissions as JSON so the frontend can dynamically
+    load them and populate the table.
+    """
+    logger.info(f"SUBMISSIONS_DB: {submissions_db}")
+    return JSONResponse(submissions_db)

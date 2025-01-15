@@ -161,3 +161,11 @@ input[type="submit"]:hover {
 .arrow.collapsed {
     transform: rotate(-90deg);
 }
+
+.success-banner {
+    background-color: green;
+    color: white;
+    padding: 10px;
+    margin-bottom: 10px;
+    text-align: center;
+}
