@@ -8,7 +8,7 @@ import time
 import logging
 from dotenv import load_dotenv
 
-from fastapi import FastAPI, Form, Body, Request, HTTPException, UploadFile
+from fastapi import FastAPI, Form, HTTPException, UploadFile
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse, JSONResponse
 from typing import Optional, List, Union
@@ -63,7 +63,7 @@ def validate_answer(schema: Optional[str], answer: any):
         if answer.lower() == "n/a" or answer.lower() == "na" or answer == "":
             return "n/a"
     if schema == "number" and not isinstance(answer, (int, float)):
-        try: # Try to convert to a number
+        try:
             answer = float(answer)
         except ValueError:
             raise ValueError(f"Expected a number for schema 'number', got: {type(answer).__name__}")
@@ -82,7 +82,7 @@ def validate_answer(schema: Optional[str], answer: any):
     return answer
 
 
-def validate_submission(content: str) -> SubmissionSchema:
+def validate_submission(content: str | bytes) -> SubmissionSchema:
     """Validate the string as JSON, check schema constraints, etc."""
     try:
         data = json.loads(content)
