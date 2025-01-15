@@ -1,8 +1,11 @@
 #!/usr/bin/env python3
 
+import os
 import json
 import uuid
 import time
+import logging
+from dotenv import load_dotenv
 
 from fastapi import FastAPI, Form, Body, Request, HTTPException, UploadFile
 from fastapi.staticfiles import StaticFiles
@@ -12,6 +15,13 @@ from pydantic import BaseModel, ValidationError, Field
 import uvicorn
 
 app = FastAPI()
+load_dotenv()
+
+# Logging
+if os.getenv("DEVELOPMENT"):
+    logger = logging.getLogger(__name__)
+    logging.basicConfig(filename='temp/debug.log', encoding='utf-8', level=logging.INFO)
+
 
 # Mount the static directory for serving CSS
 app.mount("/static", StaticFiles(directory="src/static"), name="static")
@@ -82,6 +92,9 @@ def process_submission(submission: SubmissionSchema) -> dict:
     Processes a validated submission, generates a signature,
     and stores the submission in the database.
     """
+
+    if os.getenv("DEVELOPMENT"): logging.info(f"Processing submission: {submission}")
+
     # Generate a signature
     submission_bytes = str(submission.model_dump()).encode("utf-8")
     signature = sign_with_timestamp_server(submission_bytes)
