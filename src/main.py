@@ -82,6 +82,8 @@ def validate_submission(content: str | bytes):
 
         if os.getenv("CHECK_QUESTIONS") == "True":
             question_issues = validate_questions(submission)
+            if len(question_issues) > 5:
+                question_issues = question_issues[:5] + [f"\n - ... and {len(question_issues) - 5} more question issue(s)"]
 
         answer_issues = []
         for idx, item in enumerate(submission.data):
