@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
 import os
+import re
 import json
 import uuid
 import time
@@ -29,6 +30,8 @@ app.mount("/static", StaticFiles(directory="src/static"), name="static")
 # In-memory submission storage
 # TODO add a database connection here
 submissions_db = []
+with open("src/static/questions.json", "r", encoding="utf-8") as file:
+    true_questions = json.load(file)
 
 
 class AnswerItem(BaseModel):
@@ -36,37 +39,62 @@ class AnswerItem(BaseModel):
     schema: Optional[str]
     answer: Union[bool, int, float, str] = Field(..., description="Answer value, type depends on schema")
 
-    @staticmethod
-    def validate_answer(schema: Optional[str], answer: any):
-        # TODO think about how to handle schema deviations (reject submission, try to fix it first)
-        if answer is None:
-            return 1
-        if isinstance(answer, str):
-            if answer.lower() == "n/a" or answer == "" or answer.lower == "na":
-                return 1
-        else:
-            if schema == "number" and not isinstance(answer, (int, float)):
-                raise ValueError(f"Expected a number for schema 'number', got: {type(answer).__name__}")
-            if schema == "name" and not isinstance(answer, str):
-                raise ValueError(f"Expected text for schema 'text', got: {type(answer).__name__}")
-            if schema == "boolean" and not isinstance(answer, bool):
-                # TODO handle boolean case (True vs. true, yes/no case)
-                raise ValueError(f"Expected text for schema 'text', got: {type(answer).__name__}")
-
-    def __init__(self, **kwargs):
-        super().__init__(**kwargs)
-        self.validate_answer(self.schema, self.answer)
-
 
 class SubmissionSchema(BaseModel):
     data: List[AnswerItem]
 
 
-def validate_submission(content_str: str | bytes) -> SubmissionSchema:
+def validate_questions(submission: SubmissionSchema):
+    if submission:
+        for true_item, submission_item in zip(true_questions, submission.data):
+            true = re.sub(r'[^A-Za-z0-9\s]', '', true_item["question"].lower())
+            submission = re.sub(r'[^A-Za-z0-9\s]', '', submission_item.question.lower())
+            if true != submission:
+                raise ValueError(f"Question mismatch: {submission_item.question} != {true_item['question']}")
+    else:
+        raise ValueError("Questions are missing")
+
+
+def validate_answer(schema: Optional[str], answer: any):
+    # TODO show warnings before submitting instead of error
+    if answer is None:
+        return "n/a"
+    if isinstance(answer, str):
+        if answer.lower() == "n/a" or answer.lower() == "na" or answer == "":
+            return "n/a"
+    if schema == "number" and not isinstance(answer, (int, float)):
+        try: # Try to convert to a number
+            answer = float(answer)
+        except ValueError:
+            raise ValueError(f"Expected a number for schema 'number', got: {type(answer).__name__}")
+    if schema == "name" and not isinstance(answer, str):
+        raise ValueError(f"Expected text for schema 'name', got: {type(answer).__name__}")
+    if schema == "boolean":
+        if isinstance(answer, str):
+            if answer.lower() in ["true", "yes", "True"]:
+                return True
+            elif answer.lower() in ["false", "no", "False"]:
+                return False
+            else:
+                raise ValueError(f"Expected boolean for schema 'boolean', got: {type(answer).__name__}")
+        if not isinstance(answer, bool):
+            raise ValueError(f"Expected boolean for schema 'boolean', got: {type(answer).__name__}")
+    return answer
+
+
+def validate_submission(content: str) -> SubmissionSchema:
     """Validate the string as JSON, check schema constraints, etc."""
     try:
-        data = json.loads(content_str)
+        data = json.loads(content)
         submission = SubmissionSchema(data=data)
+
+        if os.getenv("CHECK_QUESTIONS") == "True":
+            validate_questions(submission)
+
+        for idx, item in enumerate(submission.data):
+            answer = validate_answer(item.schema, item.answer)
+            submission.data[idx].answer = answer
+
     except (json.JSONDecodeError, ValidationError) as e:
         raise ValueError(f"Invalid JSON or schema: {e}")
     return submission

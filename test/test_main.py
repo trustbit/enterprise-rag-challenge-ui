@@ -55,6 +55,27 @@ def test_submit_valid():
     assert subs[0]["data"] == payload
 
 
+def test_submit_partially_invalid():
+    """
+    Test a submission with some valid and some invalid data.
+    The API should return an error.
+    """
+    invalid_payload = [
+        {"question": "Q1", "schema": "name", "answer": "n/a"},
+        {"question": "Q2", "schema": "number", "answer": "2.4"},
+        {"question": "Q2", "schema": "boolean", "answer": "a"}
+    ]
+    response = client.post(
+        "/submit-ui",
+        data={"content": json.dumps(invalid_payload)}
+    )
+    assert response.status_code == 400
+    result = response.json()
+    assert "Invalid form data" in str(result)
+    # TODO check for specific use cases
+    # assert "Answer must be a number" in result["error"]
+
+
 def test_submit_invalid():
     """
     Test submission with invalid data (e.g. negative age).
