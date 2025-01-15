@@ -3,7 +3,6 @@
 <head>
   <meta charset="UTF-8" />
   <title>RAG Challenge Submission API</title>
-  <!-- Link to the external stylesheet in /static -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap" rel="stylesheet">
@@ -11,11 +10,8 @@
 </head>
 <body>
   <div class="header">
-    <a href="https://www.timetoact-group.at/details/enterprise-rag-challenge" target="_blank">
-        <img src="static/ERC_header_8.png" alt="Logo">
-    </a>
+    <img src="static/ERC_header_8.png" alt="Logo">
   </div>
-
 
   <div class="content">
     <h1>Answer Submission</h1>
@@ -36,16 +32,25 @@
 
     <h2>Submission via API</h2>
     <p>Example with curl:</p>
-    <pre>
+    <div class="code-container">
+      <button class="copy-button" onclick="copyCode('curl-code')">
+        Copy
+      </button>
+      <pre id="curl-code">
 curl -X 'POST' \
   'http://127.0.0.1:8000/submit' \
   -H 'accept: application/json' \
   -H 'Content-Type: multipart/form-data' \
   -F 'file=@test/samples/sample_answer.json;type=application/json'
-    </pre>
+      </pre>
+    </div>
 
     <p>Example with Python requests (UNTESTED):</p>
-    <pre>
+    <div class="code-container">
+      <button class="copy-button" onclick="copyCode('python-code')">
+        Copy
+      </button>
+      <pre id="python-code">
 import requests
 
 resp = requests.post(
@@ -58,7 +63,8 @@ resp = requests.post(
 ]
 )
 print(resp.json())
-    </pre>
+      </pre>
+    </div>
 
     <h2>All Submissions</h2>
     <table id="submissionsTable">
@@ -99,6 +105,25 @@ print(resp.json())
 
         tbody.appendChild(row);
       });
+    }
+
+    async function copyCode(elementId) {
+      const codeElement = document.getElementById(elementId);
+      const button = codeElement.parentElement.querySelector('.copy-button');
+
+      try {
+        await navigator.clipboard.writeText(codeElement.textContent.trim());
+
+        // Visual feedback
+        button.classList.add('copied');
+
+        // Reset after 2 seconds
+        setTimeout(() => {
+          button.classList.remove('copied');
+        }, 2500);
+      } catch (err) {
+        console.error('Failed to copy:', err);
+      }
     }
 
     window.addEventListener("DOMContentLoaded", loadSubmissions);
