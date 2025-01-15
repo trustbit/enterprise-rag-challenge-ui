@@ -18,8 +18,20 @@ python -m uvicorn src.main:app --reload
 ```
 
 ## Test submission with curl
+### Test UI submission (string)
 ```bash
-curl -X POST -H "Content-Type: application/json" -d '[{ "question": "Q1", "schema": "name", "answer": "A1" }, { "question": "Q2", "schema": "number", "answer": 2.5 }, { "question": "Q2", "schema": "boolean", "answer": true }]' http://localhost:8000/submit
+curl -X 'POST' \
+  'http://127.0.0.1:8000/submit-ui' \
+  -H 'accept: application/json' \
+  -H 'Content-Type: application/x-www-form-urlencoded' \
+  -d 'content=%5B%7B%22question%22%3A%22Q1%22%2C%22schema%22%3A%22name%22%2C%22answer%22%3A%22A1%22%7D%2C%7B%22question%22%3A%22Q2%22%2C%22schema%22%3A%22number%22%2C%22answer%22%3A2.5%7D%2C%7B%22question%22%3A%22Q2%22%2C%22schema%22%3A%22boolean%22%2C%22answer%22%3Atrue%7D%5D'
 ```
 
-curl -X POST -H "Content-Type: application/json" -d '{"question": "What was the Quick Ratio of IMUNON, INC. in June 30, 2021?", "answer": 1.5}' http://localhost:8000/submit
+### Test file submission (json)
+```bash
+curl -X 'POST' \
+  'http://127.0.0.1:8000/submit'
+  -H 'accept: application/json' \
+  -H 'Content-Type: multipart/form-data' \
+  -F 'file=@test/samples/sample_answer.json;type=application/json'
+```

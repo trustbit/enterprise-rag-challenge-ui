@@ -4,7 +4,7 @@ import json
 import uuid
 import time
 
-from fastapi import FastAPI, Form, Body
+from fastapi import FastAPI, Form, Body, Request, HTTPException, UploadFile
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse, JSONResponse
 from typing import Optional, List, Union
@@ -21,7 +21,7 @@ app.mount("/static", StaticFiles(directory="src/static"), name="static")
 submissions_db = []
 
 
-class QuestionAnswer(BaseModel):
+class AnswerItem(BaseModel):
     question: Optional[str]
     schema: Optional[str]
     answer: Union[bool, int, float, str] = Field(..., description="Answer value, type depends on schema")
@@ -49,10 +49,10 @@ class QuestionAnswer(BaseModel):
 
 
 class SubmissionSchema(BaseModel):
-    data: List[QuestionAnswer]
+    data: List[AnswerItem]
 
 
-def validate_submission(content_str: str) -> SubmissionSchema:
+def validate_submission(content_str: str | bytes) -> SubmissionSchema:
     """Validate the string as JSON, check schema constraints, etc."""
     try:
         data = json.loads(content_str)
@@ -77,42 +77,13 @@ def sign_with_timestamp_server(payload_bytes: bytes) -> str:
     return mock_hash
 
 
-@app.get("/")
-def serve_index():
-    """Return the main HTML page."""
-    return FileResponse("src/index.html")
-
-
-@app.get("/submissions")
-def get_submissions():
+def process_submission(submission: SubmissionSchema) -> dict:
     """
-    Return all submissions as JSON so the frontend can dynamically
-    load them and populate the table.
+    Processes a validated submission, generates a signature,
+    and stores the submission in the database.
     """
-    return JSONResponse(submissions_db)
-
-
-# TODO instead of json return, show fail/success in UI
-@app.post("/submit")
-def submit(content: str = Form(...), body: SubmissionSchema = Body(None)):
-    """
-    Submits data to the backend via a form or JSON.
-    Validates, signs, and stores the submission.
-    """
-    if content:
-        try:
-            submission = validate_submission(content)
-        except ValueError as e:
-            return {"error": str(e)}
-    elif body:
-        # FIXME still not working via curl
-        print(body)
-        submission = body
-    else:
-        return {"error": "No input provided"}
-
     # Generate a signature
-    submission_bytes = content.encode("utf-8")
+    submission_bytes = str(submission.model_dump()).encode("utf-8")
     signature = sign_with_timestamp_server(submission_bytes)
 
     # Build a record
@@ -134,6 +105,55 @@ def submit(content: str = Form(...), body: SubmissionSchema = Body(None)):
         "time": now_str,
         "data": submission.model_dump()["data"],
     }
+
+
+@app.get("/")
+def serve_index():
+    """Return the main HTML page."""
+    return FileResponse("src/index.html")
+
+
+@app.get("/submissions")
+def get_submissions():
+    """
+    Return all submissions as JSON so the frontend can dynamically
+    load them and populate the table.
+    """
+    return JSONResponse(submissions_db)
+
+
+# TODO instead of json return, show fail/success in UI
+@app.post("/submit")
+async def submit(file: UploadFile):
+    try:
+        # Ensure the file is a JSON file
+        if not file.filename.endswith('.json'):
+            raise HTTPException(status_code=400, detail="Uploaded file must be a JSON file.")
+
+        # Read the uploaded file
+        content = await file.read()
+
+        submission = validate_submission(content)  # Parse and validate form input
+        response = process_submission(submission)
+        return response
+
+        # # Process or store the validated data as needed
+        # return {"message": "JSON file successfully processed.", "items": len(validated_data)}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"An error occurred: {str(e)}")
+
+
+@app.post("/submit-ui")
+def submit_ui(content: str = Form(...)):
+    """
+    Endpoint for submitting data via an HTML form.
+    """
+    try:
+        submission = validate_submission(content)  # Parse and validate form input
+        response = process_submission(submission)
+        return response
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=f"Invalid form data: {str(e)}")
 
 
 if __name__ == "__main__":

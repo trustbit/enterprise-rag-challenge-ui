@@ -37,7 +37,7 @@ def test_submit_valid():
     ]
 
     response = client.post(
-        "/submit",
+        "/submit-ui",
         data={"content": json.dumps(payload)}  # mimics form data with JSON
     )
     assert response.status_code == 200
@@ -62,11 +62,11 @@ def test_submit_invalid():
     """
     invalid_payload = {"name": "InvalidUser", "age": -1}
     response = client.post(
-        "/submit",
+        "/submit-ui",
         data={"content": json.dumps(invalid_payload)}
     )
-    assert response.status_code == 200  # The route might return 200 but contain an "error" key
+    assert response.status_code == 400
     result = response.json()
-    assert "error" in result
+    assert "Invalid form data" in str(result)
     # TODO check for specific use cases
     # assert "Age must be a positive integer" in result["error"]
