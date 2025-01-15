@@ -121,7 +121,7 @@ input[type="submit"]:hover {
 }
 
 .copy-button.copied {
-    background: #4CAF50;
+    background: #2a932b;
     color: white;
-    border-color: #45a049;
+    border-color: #2a932b;
 }
