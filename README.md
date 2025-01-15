@@ -30,7 +30,7 @@ curl -X 'POST' \
 ### Test file submission (json)
 ```bash
 curl -X 'POST' \
-  'http://127.0.0.1:8000/submit'
+  'http://127.0.0.1:8000/submit' \
   -H 'accept: application/json' \
   -H 'Content-Type: multipart/form-data' \
   -F 'file=@test/samples/sample_answer.json;type=application/json'
