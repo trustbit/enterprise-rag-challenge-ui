@@ -202,10 +202,13 @@ if __name__ == "__main__":
         alert("Submission has issues:\n" + result.issues.join("\n"));
       } else if (result.status === "success") {
         alert("Submission successful!");
-        const banner = document.createElement("div");
-        banner.classList.add("success-banner");
-        banner.textContent = "Answers successfully submitted!";
-        document.body.insertBefore(banner, document.body.firstChild);
+        const existingBanner = document.querySelector(".success-banner");
+        if (!existingBanner) {
+          const banner = document.createElement("div");
+          banner.classList.add("success-banner");
+          banner.textContent = "Answers successfully submitted!";
+          document.body.insertBefore(banner, document.body.firstChild);
+        }
       }
       await loadSubmissions();
     });
