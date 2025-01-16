@@ -54,7 +54,7 @@ def validate_questions(submission: SubmissionSchema):
 def validate_answer(schema: Optional[str], answer: any):
     if answer is None:
         return "n/a", None
-    if isinstance(answer, str) and answer.lower() in ["n/a", "na", ""]:
+    if isinstance(answer, str) and answer.lower() in ["n/a", "na", "nan", ""]:
         return "n/a", None
     if schema == "number" and not isinstance(answer, (int, float)):
         try:
