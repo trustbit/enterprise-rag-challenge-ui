@@ -25,7 +25,7 @@ app.mount("/static", StaticFiles(directory="src/static"), name="static")
 templates = Jinja2Templates(directory="src/")
 
 # In-memory submission storage
-# TODO add a database connection here
+# TODO Just write to folder of json files
 submissions_db = []
 with open("src/static/questions.json", "r", encoding="utf-8") as file:
     true_questions = json.load(file)
