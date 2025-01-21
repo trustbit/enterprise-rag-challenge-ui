@@ -42,7 +42,7 @@ class AnswerItem(BaseModel):
 
 class SubmissionSchema(BaseModel):
     team_name: str
-    contact_mail_address: str  # TODO validate email address
+    contact_mail_address: str
     submission: List[AnswerItem]
 
     class Config:
@@ -108,22 +108,26 @@ def validate_submission(submission: SubmissionSchema) -> list:
 
     if os.getenv("CHECK_QUESTIONS") == "True":
         issues_questions, issues_schema = validate_answer_item(submission)
-        if len(issues_questions) > 5:
-            issues_questions = issues_questions[:5] + [
-                f"\n - ... and {len(issues_questions) - 5} more question issue(s)"]
-        if len(issues_schema) > 5:
-            issues_schema = issues_schema[:5] + [
-                f"\n - ... and {len(issues_schema) - 5} more schema issue(s)"]
+        if len(issues_questions) > 3:
+            issues_questions = issues_questions[:3] + [
+                f"\n - ... and {len(issues_questions) - 3} more question issue(s)"]
+        if len(issues_schema) > 3:
+            issues_schema = issues_schema[:3] + [
+                f"\n - ... and {len(issues_schema) - 3} more schema issue(s)"]
 
-    answer_issues = []
+    issues_answers = []
     for idx, item in enumerate(submission.submission):
         answer, issue = validate_answer(item.schema, item.answer)
         submission.submission[idx].answer = answer
         if issue:
             issue = f"\n - Submission item {idx}: {issue}"
-            answer_issues.append(issue)
+            issues_answers.append(issue)
 
-    return issue_email + issues_questions + issues_schema + answer_issues
+    if len(issues_answers) > 3:
+        issues_answers = issues_answers[:3] + [
+            f"\n - ... and {len(issues_answers) - 3} more answer issue(s)"]
+
+    return issue_email + issues_questions + issues_schema + issues_answers
 
 
 def get_submission_schema(content: str | bytes) -> SubmissionSchema:

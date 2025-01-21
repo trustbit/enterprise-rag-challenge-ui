@@ -1,38 +1,39 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <meta charset="UTF-8" />
+  <meta charset="UTF-8"/>
   <title>RAG Challenge Submission API</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap"
+        rel="stylesheet">
   <link rel="stylesheet" href="static/style.css">
 </head>
 <body>
-  <div class="header">
-    <img src="static/ERC_header_8.png" alt="Logo">
-  </div>
+<div class="header">
+  <img src="static/ERC_header_8.png" alt="Logo">
+</div>
 
-  <div class="content">
-    <h1>Answer Submission</h1>
+<div class="content">
+  <h1>Answer Submission</h1>
 
 
-<!-- Manual Submission -->
-    <div class="collapsible-section">
-      <button class="section-header">
-        <svg class="arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <path d="M6 9l6 6 6-6" stroke-linecap="round" stroke-linejoin="round"/>
-        </svg>
-        <h2>Manual Submission</h2>
-      </button>
-      <div class="section-content">
-        <form id="submissionForm">
-          <label for="content">Enter submission JSON:</label><br><br>
-          <textarea id="content" name="content" rows="11">
+  <!-- Manual Submission -->
+  <div class="collapsible-section">
+    <button class="section-header">
+      <svg class="arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M6 9l6 6 6-6" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+      <h2>Manual Submission</h2>
+    </button>
+    <div class="section-content">
+      <form id="submissionForm">
+        <label for="content">Enter submission JSON:</label><br><br>
+        <textarea id="content" name="content" rows="11">
 {
 "team_name": "test-team",
 "contact_mail_address": "test.team@rag-tat.com",
-"submissions":
+"submission":
     [
       { "question": "Q1", "schema": "name", "answer": "A1" },
       { "question": "Q2", "schema": "number", "answer": 2.5 },
@@ -40,43 +41,43 @@
       { "question": "Q2", "schema": "boolean", "answer": "n/a" }
     ]
 }</textarea><br><br>
-          <button type="button" id="checkButton">Check Submission</button>
-          <button type="button" id="submitButton">Submit</button>
-        </form>
-      <div id="validation-issues" style="color: red; margin-bottom: 10px;"></div>
-      </div>
+        <button type="button" id="checkButton">Check Submission</button>
+        <button type="button" id="submitButton">Submit</button>
+      </form>
+      <div id="validation-issues"></div>
     </div>
+  </div>
 
 
-<!-- Check Submission -->
-    <div class="collapsible-section">
-      <button class="section-header">
-        <svg class="arrow collapsed" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <path d="M6 9l6 6 6-6" stroke-linecap="round" stroke-linejoin="round"/>
-        </svg>
-        <h2>Check Submission Format via API</h2>
-      </button>
-      <div class="section-content hidden">
-                <p>With curl:</p>
-        <div class="code-container">
-          <button class="copy-button" onclick="copyCode('curl-code-check')">
-            Copy
-          </button>
-          <pre id="curl-code-check">
+  <!-- Check Submission -->
+  <div class="collapsible-section">
+    <button class="section-header">
+      <svg class="arrow collapsed" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M6 9l6 6 6-6" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+      <h2>Check Submission Format via API</h2>
+    </button>
+    <div class="section-content hidden">
+      <p>With curl:</p>
+      <div class="code-container">
+        <button class="copy-button" onclick="copyCode('curl-code-check')">
+          Copy
+        </button>
+        <pre id="curl-code-check">
 curl -X 'POST' \
   'http://127.0.0.1:8000/check-submission' \
   -H 'accept: application/json' \
   -H 'Content-Type: multipart/form-data' \
   -F 'file=@test/samples/sample_answer.json;type=application/json'
           </pre>
-        </div>
+      </div>
 
-        <p>With Python requests:</p>
-        <div class="code-container">
-          <button class="copy-button" onclick="copyCode('python-code-check')">
-            Copy
-          </button>
-          <pre id="python-code-check">
+      <p>With Python requests:</p>
+      <div class="code-container">
+        <button class="copy-button" onclick="copyCode('python-code-check')">
+          Copy
+        </button>
+        <pre id="python-code-check">
 import requests
 
 def main():
@@ -92,41 +93,41 @@ def main():
 if __name__ == "__main__":
     main()
           </pre>
-        </div>
-
       </div>
+
     </div>
+  </div>
 
 
-<!-- Submit via API -->
-    <div class="collapsible-section">
-      <button class="section-header">
-        <svg class="arrow collapsed" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <path d="M6 9l6 6 6-6" stroke-linecap="round" stroke-linejoin="round"/>
-        </svg>
-        <h2>Submit via API</h2>
-      </button>
-      <div class="section-content hidden">
-        <p>With curl:</p>
-        <div class="code-container">
-          <button class="copy-button" onclick="copyCode('curl-code-submit')">
-            Copy
-          </button>
-          <pre id="curl-code-submit">
+  <!-- Submit via API -->
+  <div class="collapsible-section">
+    <button class="section-header">
+      <svg class="arrow collapsed" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M6 9l6 6 6-6" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+      <h2>Submit via API</h2>
+    </button>
+    <div class="section-content hidden">
+      <p>With curl:</p>
+      <div class="code-container">
+        <button class="copy-button" onclick="copyCode('curl-code-submit')">
+          Copy
+        </button>
+        <pre id="curl-code-submit">
 curl -X 'POST' \
   'http://127.0.0.1:8000/submit' \
   -H 'accept: application/json' \
   -H 'Content-Type: multipart/form-data' \
   -F 'file=@test/samples/sample_answer.json;type=application/json'
           </pre>
-        </div>
+      </div>
 
-        <p>With Python requests:</p>
-        <div class="code-container">
-          <button class="copy-button" onclick="copyCode('python-code-submit')">
-            Copy
-          </button>
-          <pre id="python-code-submit">
+      <p>With Python requests:</p>
+      <div class="code-container">
+        <button class="copy-button" onclick="copyCode('python-code-submit')">
+          Copy
+        </button>
+        <pre id="python-code-submit">
 import requests
 
 def main():
@@ -142,104 +143,104 @@ def main():
 if __name__ == "__main__":
     main()
           </pre>
-        </div>
-      </div>
-    </div>
-
-
-<!-- Submissions Table -->
-    <div class="collapsible-section">
-      <button class="section-header">
-        <svg class="arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <path d="M6 9l6 6 6-6" stroke-linecap="round" stroke-linejoin="round"/>
-        </svg>
-        <h2>Submissions Table</h2>
-      </button>
-      <div class="section-content">
-        <table id="submissionsTable">
-          <thead>
-            <tr>
-              <th>Time</th>
-              <th>ID</th>
-              <th>Signature</th>
-            </tr>
-          </thead>
-          <tbody>
-          </tbody>
-        </table>
       </div>
     </div>
   </div>
 
-  <script>
-    // Handle collapsible sections
-    document.querySelectorAll('.section-header').forEach(header => {
-      header.addEventListener('click', () => {
-        const content = header.nextElementSibling;
-        const arrow = header.querySelector('.arrow');
 
-        content.classList.toggle('hidden');
-        arrow.classList.toggle('collapsed');
-      });
+  <!-- Submissions Table -->
+  <div class="collapsible-section">
+    <button class="section-header">
+      <svg class="arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M6 9l6 6 6-6" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+      <h2>Submissions Table</h2>
+    </button>
+    <div class="section-content">
+      <table id="submissionsTable">
+        <thead>
+        <tr>
+          <th>Time</th>
+          <th>ID</th>
+          <th>Signature</th>
+        </tr>
+        </thead>
+        <tbody>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<script>
+  // Handle collapsible sections
+  document.querySelectorAll('.section-header').forEach(header => {
+    header.addEventListener('click', () => {
+      const content = header.nextElementSibling;
+      const arrow = header.querySelector('.arrow');
+
+      content.classList.toggle('hidden');
+      arrow.classList.toggle('collapsed');
     });
+  });
 
-    // Copy code buttons
-    async function copyCode(elementId) {
-      const codeElement = document.getElementById(elementId);
-      const button = codeElement.parentElement.querySelector('.copy-button');
+  // Copy code buttons
+  async function copyCode(elementId) {
+    const codeElement = document.getElementById(elementId);
+    const button = codeElement.parentElement.querySelector('.copy-button');
 
-      try {
-        await navigator.clipboard.writeText(codeElement.textContent.trim());
+    try {
+      await navigator.clipboard.writeText(codeElement.textContent.trim());
 
-        // Visual feedback
-        button.classList.add('copied');
+      // Visual feedback
+      button.classList.add('copied');
 
-        // Reset after 2 seconds
-        setTimeout(() => {
-          button.classList.remove('copied');
-        }, 2500);
-      } catch (err) {
-        console.error('Failed to copy:', err);
-      }
+      // Reset after 2 seconds
+      setTimeout(() => {
+        button.classList.remove('copied');
+      }, 2500);
+    } catch (err) {
+      console.error('Failed to copy:', err);
     }
+  }
 
-    // Load submissions
-    async function loadSubmissions() {
-      const resp = await fetch("/submissions");
-      const data = await resp.json();
+  // Load submissions
+  async function loadSubmissions() {
+    const resp = await fetch("/submissions");
+    const data = await resp.json();
 
-      const tbody = document.querySelector("#submissionsTable tbody");
-      tbody.innerHTML = "";
+    const tbody = document.querySelector("#submissionsTable tbody");
+    tbody.innerHTML = "";
 
-      data.forEach(entry => {
-        const row = document.createElement("tr");
+    data.forEach(entry => {
+      const row = document.createElement("tr");
 
-        const timeCell = document.createElement("td");
-        timeCell.textContent = entry.time;
-        row.appendChild(timeCell);
+      const timeCell = document.createElement("td");
+      timeCell.textContent = entry.time;
+      row.appendChild(timeCell);
 
-        const idCell = document.createElement("td");
-        idCell.textContent = entry.id;
-        row.appendChild(idCell);
+      const idCell = document.createElement("td");
+      idCell.textContent = entry.id;
+      row.appendChild(idCell);
 
-        const sigCell = document.createElement("td");
-        sigCell.textContent = entry.signature;
-        row.appendChild(sigCell);
+      const sigCell = document.createElement("td");
+      sigCell.textContent = entry.signature;
+      row.appendChild(sigCell);
 
-        tbody.appendChild(row);
-      });
-    }
+      tbody.appendChild(row);
+    });
+  }
 
-    // Adding submit and check button functionality
-    document.getElementById("checkButton").addEventListener("click", async () => {
-      const content = document.getElementById("content").value;
-      const response = await fetch("/check-submission-ui", {
-        method: "POST",
-        headers: { "Content-Type": "application/x-www-form-urlencoded" },
-        body: new URLSearchParams({ content }),
-      });
-      const result = await response.json();
-      const issuesDiv = document.getElementById("validation-issues");
+  // Adding submit and check button functionality
+  document.getElementById("checkButton").addEventListener("click", async () => {
+    const content = document.getElementById("content").value;
+    const response = await fetch("/check-submission-ui", {
+      method: "POST",
+      headers: {"Content-Type": "application/x-www-form-urlencoded"},
+      body: new URLSearchParams({content}),
+    });
+    const result = await response.json();
+    const issuesDiv = document.getElementById("validation-issues");
 
     if (!response.ok) {
       alert("Error: " + response.status + " " + result.detail);
@@ -276,10 +277,11 @@ if __name__ == "__main__":
       }
       const response = await fetch("/submit-ui", {
         method: "POST",
-        headers: { "Content-Type": "application/x-www-form-urlencoded" },
-        body: new URLSearchParams({ content }),
+        headers: {"Content-Type": "application/x-www-form-urlencoded"},
+        body: new URLSearchParams({content}),
       });
       const result = await response.json();
+
       if (result.status === "issues found") {
         alert("Successfully submitted with issues!\n\nConsider submitting again with identical team name and mail " +
             "address to overwrite this submission. \n\n" +
@@ -306,9 +308,9 @@ if __name__ == "__main__":
     await loadSubmissions();
   });
 
-    window.addEventListener("DOMContentLoaded", () => {
-      loadSubmissions();
-    });
-  </script>
+  window.addEventListener("DOMContentLoaded", () => {
+    loadSubmissions();
+  });
+</script>
 </body>
 </html>

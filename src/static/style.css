@@ -83,6 +83,12 @@ textarea {
     font-family: monospace;
 }
 
+#validation-issues {
+    color: red;
+    margin: 0 30px 10px 30px;
+    font-size: 0.8rem;
+}
+
 button[type="button"] {
     background-color: rgba(12, 49, 74, 1);
     color: rgba(255, 255, 255, 1);
