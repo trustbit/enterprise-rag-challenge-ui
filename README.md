@@ -40,8 +40,8 @@ curl -X 'POST' \
 NEW Schema
 ```json
 {
-"submission-name": "xy",
-"contact-email": "xy@test.com",
+"team_name": "xy",
+"contact_mail_address": "xy@test.com",
 "submissions":
     [
     

@@ -16,6 +16,8 @@
   <div class="content">
     <h1>Answer Submission</h1>
 
+
+<!-- Manual Submission -->
     <div class="collapsible-section">
       <button class="section-header">
         <svg class="arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -26,14 +28,18 @@
       <div class="section-content">
         <form id="submissionForm">
           <label for="content">Enter submission JSON:</label><br><br>
-          <textarea id="content" name="content" rows="7">
-[
-  { "question": "Q1", "schema": "name", "answer": "A1" },
-  { "question": "Q2", "schema": "number", "answer": 2.5 },
-  { "question": "Q2", "schema": "boolean", "answer": true },
-  { "question": "Q2", "schema": "boolean", "answer": "n/a" }
-]
-          </textarea><br><br>
+          <textarea id="content" name="content" rows="11">
+{
+"team_name": "test-team",
+"contact_mail_address": "test.team@rag-tat.com",
+"submissions":
+    [
+      { "question": "Q1", "schema": "name", "answer": "A1" },
+      { "question": "Q2", "schema": "number", "answer": 2.5 },
+      { "question": "Q2", "schema": "boolean", "answer": true },
+      { "question": "Q2", "schema": "boolean", "answer": "n/a" }
+    ]
+}</textarea><br><br>
           <button type="button" id="checkButton">Check Submission</button>
           <button type="button" id="submitButton">Submit</button>
         </form>
@@ -41,20 +47,72 @@
       </div>
     </div>
 
+
+<!-- Check Submission -->
     <div class="collapsible-section">
       <button class="section-header">
         <svg class="arrow collapsed" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
           <path d="M6 9l6 6 6-6" stroke-linecap="round" stroke-linejoin="round"/>
         </svg>
-        <h2>Submission via API</h2>
+        <h2>Check Submission Format via API</h2>
+      </button>
+      <div class="section-content hidden">
+                <p>With curl:</p>
+        <div class="code-container">
+          <button class="copy-button" onclick="copyCode('curl-code-check')">
+            Copy
+          </button>
+          <pre id="curl-code-check">
+curl -X 'POST' \
+  'http://127.0.0.1:8000/check-submission' \
+  -H 'accept: application/json' \
+  -H 'Content-Type: multipart/form-data' \
+  -F 'file=@test/samples/sample_answer.json;type=application/json'
+          </pre>
+        </div>
+
+        <p>With Python requests:</p>
+        <div class="code-container">
+          <button class="copy-button" onclick="copyCode('python-code-check')">
+            Copy
+          </button>
+          <pre id="python-code-check">
+import requests
+
+def main():
+    url = "http://127.0.0.1:8000/check-submission"
+    headers = {"accept": "application/json"}
+    files = {
+        "file": ("sample_answer.json", open(r"C:\Users\felix.krause\code\trustbit\enterprise-rag-challenge-ui\test\samples\sample_answer.json", "rb"), "application/json")
+    }
+    response = requests.post(url, headers=headers, files=files)
+    assert response.status_code == 200
+    print(response.json())
+
+if __name__ == "__main__":
+    main()
+          </pre>
+        </div>
+
+      </div>
+    </div>
+
+
+<!-- Submit via API -->
+    <div class="collapsible-section">
+      <button class="section-header">
+        <svg class="arrow collapsed" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M6 9l6 6 6-6" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        <h2>Submit via API</h2>
       </button>
       <div class="section-content hidden">
         <p>With curl:</p>
         <div class="code-container">
-          <button class="copy-button" onclick="copyCode('curl-code')">
+          <button class="copy-button" onclick="copyCode('curl-code-submit')">
             Copy
           </button>
-          <pre id="curl-code">
+          <pre id="curl-code-submit">
 curl -X 'POST' \
   'http://127.0.0.1:8000/submit' \
   -H 'accept: application/json' \
@@ -65,10 +123,10 @@ curl -X 'POST' \
 
         <p>With Python requests:</p>
         <div class="code-container">
-          <button class="copy-button" onclick="copyCode('python-code')">
+          <button class="copy-button" onclick="copyCode('python-code-submit')">
             Copy
           </button>
-          <pre id="python-code">
+          <pre id="python-code-submit">
 import requests
 
 def main():
@@ -88,12 +146,14 @@ if __name__ == "__main__":
       </div>
     </div>
 
+
+<!-- Submissions Table -->
     <div class="collapsible-section">
       <button class="section-header">
         <svg class="arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
           <path d="M6 9l6 6 6-6" stroke-linecap="round" stroke-linejoin="round"/>
         </svg>
-        <h2>All Submissions</h2>
+        <h2>Submissions Table</h2>
       </button>
       <div class="section-content">
         <table id="submissionsTable">
@@ -173,7 +233,7 @@ if __name__ == "__main__":
     // Adding submit and check button functionality
     document.getElementById("checkButton").addEventListener("click", async () => {
       const content = document.getElementById("content").value;
-      const response = await fetch("/check-submission", {
+      const response = await fetch("/check-submission-ui", {
         method: "POST",
         headers: { "Content-Type": "application/x-www-form-urlencoded" },
         body: new URLSearchParams({ content }),
@@ -181,7 +241,7 @@ if __name__ == "__main__":
       const result = await response.json();
       const issuesDiv = document.getElementById("validation-issues");
 
-      if (result.status === "issues") {
+      if (result.status === "issues found") {
         issuesDiv.innerHTML = "Validation issues detected:<br>" + result.issues.join("<br>  ");
         issuesDiv.style.color = "red";
       } else {
@@ -198,7 +258,7 @@ if __name__ == "__main__":
         body: new URLSearchParams({ content }),
       });
       const result = await response.json();
-      if (result.status === "issues") {
+      if (result.status === "issues found") {
         alert("Submission has issues:\n" + result.issues.join("\n"));
       } else if (result.status === "success") {
         alert("Submission successful!");
