@@ -104,7 +104,7 @@ def validate_submission(submission: SubmissionSchema) -> list:
     if is_valid_email(submission.contact_mail_address):
         issue_email = []
     else:
-        issue_email = ["\n - Invalid email address!"]
+        issue_email = ["\n - INVALID EMAIL ADDRESS! \n"]
 
     if os.getenv("CHECK_QUESTIONS") == "True":
         issues_questions, issues_schema = validate_answer_item(submission)
@@ -230,7 +230,8 @@ async def submit(file: UploadFile):
         if issues:
             return {"status": "issues found",
                     "message": "Successfully submitted! However, issues with submission file were detected. "
-                               "Submit again with identical team details to overwrite this submission.",
+                               "Submit again with identical team name and contact mail address to overwrite this "
+                               "submission.",
                     "issues": issues,
                     "response": response}
         else:
@@ -250,7 +251,8 @@ async def submit_ui(content: str = Form(...)):
         return {"status": "issues found",
                 "message": "Successfully submitted! However, issues with submission file were detected. "
                            "Submit again with identical team details to overwrite this submission.",
-                "issues": issues}
+                "issues": issues,
+                "response": response}
     else:
         return {"status": "success",
                 "message": "Successfully submitted! Verify on submissions table",

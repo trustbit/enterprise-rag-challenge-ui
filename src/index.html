@@ -281,19 +281,30 @@ if __name__ == "__main__":
       });
       const result = await response.json();
       if (result.status === "issues found") {
-        alert("Submission has issues:\n" + result.issues.join("\n"));
+        alert("Successfully submitted with issues!\n\nConsider submitting again with identical team name and mail " +
+            "address to overwrite this submission. \n\n" +
+            "Issues: " + result.issues.join("") + "\n\n" +
+            "ID: " + result.response.id + "\n\n" +
+            "Signature: " + result.response.signature + "\n\n"
+            );
       } else if (result.status === "success") {
-        alert("Submission successful!");
-        const existingBanner = document.querySelector(".success-banner");
+        alert("Submission successful!" + "\n\n" +
+            "ID: " + result.response.id + "\n\n" +
+            "Signature: " + result.response.signature + "\n\n"
+            );
+      }
+      const existingBanner = document.querySelector(".success-banner");
         if (!existingBanner) {
           const banner = document.createElement("div");
           banner.classList.add("success-banner");
-          banner.textContent = "Answers successfully submitted!";
+          // TODO make this more pretty, maybe create template div, with display none and then fill it with the data
+          // banner.textContent = "Answers successfully submitted!";
+          banner.innerHTML = "<p>Answers successfully submitted!</p><p>ID: " + result.response.id + "</p><p>Signature: " + result.response.signature + "</p>";
           document.body.insertBefore(banner, document.body.firstChild);
         }
-      }
-      await loadSubmissions();
-    });
+    }
+    await loadSubmissions();
+  });
 
     window.addEventListener("DOMContentLoaded", () => {
       loadSubmissions();
