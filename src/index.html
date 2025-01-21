@@ -241,17 +241,39 @@ if __name__ == "__main__":
       const result = await response.json();
       const issuesDiv = document.getElementById("validation-issues");
 
-      if (result.status === "issues found") {
-        issuesDiv.innerHTML = "<b>Validation issues detected:</b><br>" + result.issues.join("<br>  ");
-        issuesDiv.style.color = "red";
-      } else {
-        issuesDiv.textContent = "No validation issues detected. Click submit button to submit!";
-        issuesDiv.style.color = "green";
-      }
-    });
+    if (!response.ok) {
+      alert("Error: " + response.status + " " + result.detail);
+      return;
+    }
 
-    document.getElementById("submitButton").addEventListener("click", async () => {
-      const content = document.getElementById("content").value;
+    if (result.status === "issues found") {
+      issuesDiv.innerHTML = "<b>Validation issues detected:</b><br>" + result.issues.join("<br>");
+      issuesDiv.style.color = "red";
+    } else {
+      issuesDiv.textContent = "No validation issues detected. Click submit button to submit!";
+      issuesDiv.style.color = "green";
+    }
+  });
+
+  document.getElementById("submitButton").addEventListener("click", async () => {
+    const content = document.getElementById("content").value;
+    const response_validation = await fetch("/check-submission-ui", {
+      method: "POST",
+      headers: {"Content-Type": "application/x-www-form-urlencoded"},
+      body: new URLSearchParams({content}),
+    });
+    const result_validation = await response_validation.json();
+
+    if (!response_validation.ok) {
+      alert("Error: " + response_validation.status + " " + result_validation.detail);
+      return;
+    } else {
+      if (result_validation.status === "issues found" || !response_validation.ok) {
+        const submitAnyway = confirm("Submission has issues:\n" + result_validation.issues.join("") + "\n\n Submit anyway?");
+        if (!submitAnyway) {
+          return;
+        }
+      }
       const response = await fetch("/submit-ui", {
         method: "POST",
         headers: { "Content-Type": "application/x-www-form-urlencoded" },

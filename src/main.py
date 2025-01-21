@@ -36,11 +36,17 @@ class AnswerItem(BaseModel):
     schema: Optional[str]
     answer: Union[bool, int, float, str] = Field(..., description="Answer value, type depends on schema")
 
+    class Config:
+        extra = "forbid"  # Disallow unexpected fields, to also validate for typos in keys
+
 
 class SubmissionSchema(BaseModel):
     team_name: str
     contact_mail_address: str  # TODO validate email address
     submission: List[AnswerItem]
+
+    class Config:
+        extra = "forbid"
 
 
 def is_valid_email(email: str) -> bool:
