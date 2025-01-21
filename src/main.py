@@ -43,18 +43,31 @@ class SubmissionSchema(BaseModel):
     submission: List[AnswerItem]
 
 
-def validate_questions(submission: SubmissionSchema):
-    issues = []
+def is_valid_email(email: str) -> bool:
+    email_pattern = r'^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$'
+    return re.match(email_pattern, email) is not None
+
+
+def validate_answer_item(submission: SubmissionSchema) -> tuple[list, list]:
+    issues_questions = []
+    issues_schema = []
     for idx, (true_item, submission_item) in enumerate(zip(true_questions, submission.submission)):
-        true = re.sub(r'[^A-Za-z0-9\s]', '', true_item["question"].lower())
-        submitted = re.sub(r'[^A-Za-z0-9\s]', '', submission_item.question.lower())
-        if true != submitted:
-            issues.append(
-                f"\n - List item {idx + 1}: Question mismatch: '{submission_item.question}' != '{true_item['question']}'")
-    return issues
+        true_question = re.sub(r'[^A-Za-z0-9\s]', '', true_item["question"].lower())
+        submitted_question = re.sub(r'[^A-Za-z0-9\s]', '', submission_item.question.lower())
+        if true_question != submitted_question:
+            issues_questions.append(
+                f"\n - Submission item {idx}: Question mismatch: '{submission_item.question}' != '{true_item['question']}'")
+
+        true_schema = true_item["schema"]
+        submitted_schema = submission_item.schema
+        if true_schema != submitted_schema:
+            issues_schema.append(
+                f"\n - Submission item {idx}: Schema mismatch: '{submission_item.schema}' != '{true_item['schema']}'")
+
+    return issues_questions, issues_schema
 
 
-def validate_answer(schema: Optional[str], answer: any):
+def validate_answer(schema: Optional[str], answer: any) -> tuple[any, Optional[str]]:
     if answer is None:
         return "n/a", None
     if isinstance(answer, str) and answer.lower() in ["n/a", "na", "nan", ""]:
@@ -76,25 +89,35 @@ def validate_answer(schema: Optional[str], answer: any):
     return answer, None
 
 
-def validate_submission(submission: SubmissionSchema):
-    question_issues = []
+def validate_submission(submission: SubmissionSchema) -> list:
+    issues_questions = []
+    issues_schema = []
     logger.info(f"CHECK_QUESTIONS: {os.getenv('CHECK_QUESTIONS')}")
 
+    # checking email address
+    if is_valid_email(submission.contact_mail_address):
+        issue_email = []
+    else:
+        issue_email = ["\n - Invalid email address!"]
+
     if os.getenv("CHECK_QUESTIONS") == "True":
-        question_issues = validate_questions(submission)
-        if len(question_issues) > 5:
-            question_issues = question_issues[:5] + [
-                f"\n - ... and {len(question_issues) - 5} more question issue(s)"]
+        issues_questions, issues_schema = validate_answer_item(submission)
+        if len(issues_questions) > 5:
+            issues_questions = issues_questions[:5] + [
+                f"\n - ... and {len(issues_questions) - 5} more question issue(s)"]
+        if len(issues_schema) > 5:
+            issues_schema = issues_schema[:5] + [
+                f"\n - ... and {len(issues_schema) - 5} more schema issue(s)"]
 
     answer_issues = []
     for idx, item in enumerate(submission.submission):
         answer, issue = validate_answer(item.schema, item.answer)
         submission.submission[idx].answer = answer
         if issue:
-            issue = f"\n - List item {idx + 1}: {issue}"
+            issue = f"\n - Submission item {idx}: {issue}"
             answer_issues.append(issue)
 
-    return question_issues + answer_issues
+    return issue_email + issues_questions + issues_schema + answer_issues
 
 
 def get_submission_schema(content: str | bytes) -> SubmissionSchema:
