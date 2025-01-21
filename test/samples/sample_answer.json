@@ -1,6 +1,6 @@
 {
-    "team_name": "xy",
-    "contact_mail_address": "xy@test.com",
+    "team_name": "test-team",
+    "contact_mail_address": "test@rag-tat.com",
     "submission": [
         {
             "question": "What was the Net Profit Margin of \"Oesterreichische Kontrollbank\" in June 30, 2023?",
@@ -25,7 +25,7 @@
         {
             "question": "What was the earnings per share (EPS) of \"Holley Inc.\" in June 30, 2023?",
             "schema": "number",
-            "answer": "n/"
+            "answer": "n/a"
         },
         {
             "question": "What was the accounts receivable of \"Petra Diamonds\" in the fiscal year 2023?",

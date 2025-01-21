@@ -44,7 +44,6 @@ NEW Schema
 "contact_mail_address": "xy@test.com",
 "submissions":
     [
-    
       { "question": "Q1", "schema": "name", "answer": "A1" },
       { "question": "Q2", "schema": "number", "answer": 2.5 },
       { "question": "Q2", "schema": "boolean", "answer": true },

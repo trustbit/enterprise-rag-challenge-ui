@@ -242,7 +242,7 @@ if __name__ == "__main__":
       const issuesDiv = document.getElementById("validation-issues");
 
       if (result.status === "issues found") {
-        issuesDiv.innerHTML = "Validation issues detected:<br>" + result.issues.join("<br>  ");
+        issuesDiv.innerHTML = "<b>Validation issues detected:</b><br>" + result.issues.join("<br>  ");
         issuesDiv.style.color = "red";
       } else {
         issuesDiv.textContent = "No validation issues detected. Click submit button to submit!";
