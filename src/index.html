@@ -156,7 +156,6 @@ if __name__ == "__main__":
 
 
   <!-- Submissions Table -->
-  <!--  TODO add refresh button -->
   <div class="collapsible-section">
     <button class="section-header">
       <svg class="arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -165,6 +164,8 @@ if __name__ == "__main__":
       <h2>Submissions Table</h2>
     </button>
     <div class="section-content">
+      <button type="button" id="loadSubmissions" onclick="loadSubmissions()">Reload</button>
+      <button type="button" id="loopLoadSubmissions" onclick="loopLoadSubmissions()">Reload every 2 sec</button>
       <table id="submissionsTable">
         <thead>
         <tr>
@@ -245,7 +246,30 @@ if __name__ == "__main__":
     });
   }
 
-  // Adding submit and check button functionality
+  let toggle_loop_load = false;
+  function loopLoadSubmissions() {
+    if (toggle_loop_load) {
+      clearInterval(interval);
+      toggle_loop_load = false;
+      // change button color
+      const successBanner = document.querySelector("#loopLoadSubmissions");
+      successBanner.style.backgroundColor = "rgba(12, 49, 74, 1)";
+    } else {
+      interval = setInterval(loadSubmissions, 2000);
+      toggle_loop_load = true;
+      // change button id=loopLoadSubmissions color
+      const successBanner = document.querySelector("#loopLoadSubmissions");
+      successBanner.style.backgroundColor = "rgb(38, 93, 133)";
+    }
+  }
+
+  // Hide success banner
+  function hideBanner() {
+    const successBanner = document.querySelector(".success-banner");
+    successBanner.style.display = "none";
+  }
+
+  // Adding check submission button functionality
   document.getElementById("checkButton").addEventListener("click", async () => {
     const content = document.getElementById("content").value;
     const response = await fetch("/check-submission-ui", {
