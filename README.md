@@ -53,8 +53,6 @@ NEW Schema
 ```
 
 **TODOs:**
-- create new schema
-- if identical submissions with same team name, then keep the latest one (but store all submissions)
 - table: time, name, signature (from TSP, with http call)
   - when submitting compute hash of whole submission, keep digest secret show (public) signature (still needed?)
 - Hash secret (show only to team) - assign random ID for questionaire
