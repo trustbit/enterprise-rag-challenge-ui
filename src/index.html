@@ -31,7 +31,7 @@
       <svg class="arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
         <path d="M6 9l6 6 6-6" stroke-linecap="round" stroke-linejoin="round"/>
       </svg>
-      <h2>Manual Submission</h2>
+      <h2>Manual File Check & Submission</h2>
     </button>
     <div class="section-content">
       <form id="submissionForm">
@@ -295,6 +295,7 @@ if __name__ == "__main__":
     }
   });
 
+  // Adding submit functionality
   document.getElementById("submitButton").addEventListener("click", async () => {
     const content = document.getElementById("content").value;
     const response_validation = await fetch("/check-submission-ui", {

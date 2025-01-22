@@ -17,7 +17,7 @@ body {
 .header img {
     min-width: 100px;
     max-width: 1000px;
-    width: 60vw;
+    width: 50vw;
     height: auto;
 }
 
@@ -54,13 +54,13 @@ h1 {
     text-align: center;
     margin: 0;
     font-weight: 550;
-    font-size: 2rem;
+    font-size: 1.8rem;
 }
 
 h2 {
     color: #333;
     font-weight: 450;
-    font-size: 1.5rem;
+    font-size: 1.3rem;
 }
 
 pre {
@@ -109,7 +109,7 @@ textarea {
 }
 
 button[type="button"] {
-    background-color: rgba(12, 49, 74, 1);
+    background-color: rgb(12, 49, 74);
     color: rgba(255, 255, 255, 1);
     padding: 8px 12px;
     border: none;
@@ -169,8 +169,7 @@ button[type="button"]:hover {
 }
 
 .section-content {
-    margin-top: 1rem;
-    margin-bottom: 40px;
+    margin: 25px 30px 40px 30px;
 }
 
 .section-content.hidden {
