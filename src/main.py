@@ -12,6 +12,10 @@ import time
 import logging
 from dotenv import load_dotenv
 
+# TODO SET PATH TO FILE WITH FINAL QUESTIONS AND SCHEMA INFORMATION
+CORRECT_QUESTIONS_PATH = "src/static/questions.json"
+SUBMISSIONS_PATH = "submissions"
+
 app = FastAPI()
 load_dotenv()
 DEV = os.getenv("DEVELOPMENT")
@@ -25,11 +29,15 @@ if DEV:
 app.mount("/static", StaticFiles(directory="src/static"), name="static")
 templates = Jinja2Templates(directory="src/")
 
-# In-memory submission storage
-# TODO Just write to folder of json files
-submissions_db = []
-with open("src/static/questions.json", "r", encoding="utf-8") as file:
-    true_questions = json.load(file)
+if DEV:
+    pass
+    # delete current json files
+    # for file in os.listdir("submissions"):
+    #     os.remove(f"submissions/{file}")
+submissions_db = [] # TODO remove
+
+with open(CORRECT_QUESTIONS_PATH, "r", encoding="utf-8") as f:
+    true_questions = json.load(f)
 
 
 class AnswerItem(BaseModel):
@@ -149,6 +157,12 @@ def sign_with_timestamp_server(payload_bytes: bytes) -> str:
     return mock_hash
 
 
+def store_submission(record: dict):
+    submissions_db.append(record)  # for dev
+    with open(os.path.join(SUBMISSIONS_PATH, f"{record['id']}.json"), "w", encoding="utf-8") as f:
+        json.dump(record, f, indent=4)
+
+
 def process_submission(submission: SubmissionSchema) -> dict:
     # TODO split into process and store submission functions
     """
@@ -167,12 +181,15 @@ def process_submission(submission: SubmissionSchema) -> dict:
     now_str = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
 
     record = {
-        "id": submission_id,
+        "team_name": submission.team_name,
+        "contact_mail_address": submission.contact_mail_address,
         "time": now_str,
+        "id": submission_id,
         "signature": signature,
         "submission": submission.model_dump()["submission"],
     }
-    submissions_db.append(record)
+
+    store_submission(record)
 
     return {
         "id": submission_id,
