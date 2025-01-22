@@ -223,6 +223,7 @@ if __name__ == "__main__":
   async function loadSubmissions() {
     const resp = await fetch("/submissions");
     const data = await resp.json();
+    data.reverse();
 
     const tbody = document.querySelector("#submissionsTable tbody");
     tbody.innerHTML = "";
