@@ -97,7 +97,8 @@
     }
 
     if (result.status === "issues found") {
-      issuesDiv.innerHTML = "<b>Validation issues detected:</b><br>" + result.issues.join("<br>");
+      issuesDiv.innerHTML = "<b>Validation issues detected:</b><br>" + result.issues.join("<br>") +
+          "<br><br>Fix the issues to ensure correct scoring of your submission!";
       issuesDiv.style.color = "red";
     } else {
       issuesDiv.textContent = "No validation issues detected. Click submit button to submit!";
@@ -120,7 +121,10 @@
       return;
     } else {
       if (result_validation.status === "issues found" || !response_validation.ok) {
-        const submitAnyway = confirm("Submission has issues:\n" + result_validation.issues.join("") + "\n\n Submit anyway?");
+        const submitAnyway = confirm("These issues could prevent correct scoring of your submission:\n"
+            + result_validation.issues.join("")
+            + "\n\n\n Please adhere to the submission guidelines to ensure correct scoring."  // TODO add link to guidelines?
+            + "\n\n Submit despite possible scoring issues?");
         if (!submitAnyway) {
           return;
         }
@@ -133,8 +137,8 @@
       const result = await response.json();
 
       if (result.status === "issues found") {
-        alert("Successfully submitted with issues!\n\nConsider submitting again with identical team name and mail " +
-            "address to overwrite this submission. \n\n" +
+        alert("Successfully submitted with issues!\n\nConsider submitting again adhering to the submission " +
+            "guidelines. Use the identical team name and mail address to overwrite this submission. \n\n" +
             "Issues: " + result.issues.join("") + "\n\n" +
             "ID: " + result.response.id + "\n\n" +
             "Signature: " + result.response.signature + "\n\n"

@@ -228,8 +228,8 @@ async def submit(file: UploadFile):
         if issues:
             return {"status": "issues found",
                     "message": "Successfully submitted! However, issues with submission file were detected. "
-                               "Submit again with identical team name and contact mail address to overwrite this "
-                               "submission.",
+                               "Consider submitting again adhering to the submission guidelines. Use the identical "
+                               "team name and mail address to overwrite this submission.",
                     "issues": issues,
                     "response": response}
         else:
@@ -248,7 +248,8 @@ async def submit_ui(content: str = Form(...)):
     if issues:
         return {"status": "issues found",
                 "message": "Successfully submitted! However, issues with submission file were detected. "
-                           "Submit again with identical team details to overwrite this submission.",
+                           "Consider submitting again adhering to the submission guidelines. Use the identical team "
+                           "name and mail address to overwrite this submission.",
                 "issues": issues,
                 "response": response}
     else:
