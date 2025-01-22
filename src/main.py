@@ -12,9 +12,7 @@ import time
 import logging
 from dotenv import load_dotenv
 
-# TODO SET PATH TO FILE WITH FINAL QUESTIONS AND SCHEMA INFORMATION
-CORRECT_QUESTIONS_PATH = "src/static/questions.json"
-SUBMISSIONS_PATH = "submissions"
+# TODO set env variables!
 
 app = FastAPI()
 load_dotenv()
@@ -32,9 +30,8 @@ if DEV:
     # delete current json files
     # for file in os.listdir("submissions"):
     #     os.remove(f"submissions/{file}")
-submissions_db = [] # TODO remove
 
-with open(CORRECT_QUESTIONS_PATH, "r", encoding="utf-8") as f:
+with open(os.getenv("CORRECT_QUESTIONS_PATH"), "r", encoding="utf-8") as f:
     true_questions = json.load(f)
 
 
@@ -156,8 +153,10 @@ def sign_with_timestamp_server(payload_bytes: bytes) -> str:
 
 
 def store_submission(record: dict):
-    submissions_db.append(record)  # for dev
-    with open(os.path.join(SUBMISSIONS_PATH, f"{record['id']}.json"), "w", encoding="utf-8") as f:
+    """
+    Store a submission record as JSON locally in SUBMISSIONS_PATH.
+    """
+    with open(os.path.join(os.getenv("SUBMISSIONS_PATH"), f"{record['id']}.json"), "w", encoding="utf-8") as f:
         json.dump(record, f, indent=4)
 
 
@@ -277,5 +276,14 @@ def get_submissions():
     Return all submissions as JSON so the frontend can dynamically
     load them and populate the table.
     """
-    logger.info(f"SUBMISSIONS_DB: {submissions_db}")
+    submissions_db = []
+    files = os.listdir(os.getenv("SUBMISSIONS_PATH"))
+
+    for file in files:
+        with open(os.path.join(os.getenv("SUBMISSIONS_PATH"), file), "r", encoding="utf-8") as f:
+            submission = json.load(f)
+            # TODO update which variables should be sent to frontend for data security and efficiency
+            submission = {k: v for k, v in submission.items() if k in ["team_name", "id", "time", "signature"]}
+            submissions_db.append(submission)
+
     return JSONResponse(submissions_db)
