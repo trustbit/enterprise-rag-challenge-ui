@@ -2,7 +2,7 @@ from fastapi import FastAPI, Form, HTTPException, UploadFile, Request
 from fastapi.responses import HTMLResponse, JSONResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
-from pydantic import BaseModel, ValidationError, Field
+from pydantic import BaseModel, ValidationError, Field, ConfigDict
 from typing import Optional, List, Union
 import json
 import os
@@ -14,9 +14,10 @@ from dotenv import load_dotenv
 
 app = FastAPI()
 load_dotenv()
+DEV = os.getenv("DEVELOPMENT")
 
 # Logging
-if os.getenv("DEVELOPMENT"):
+if DEV:
     logger = logging.getLogger(__name__)
     logging.basicConfig(filename='temp/debug.log', encoding='utf-8', level=logging.INFO)
 
@@ -32,21 +33,17 @@ with open("src/static/questions.json", "r", encoding="utf-8") as file:
 
 
 class AnswerItem(BaseModel):
+    model_config = ConfigDict(extra='forbid')  # Disallow unexpected fields, to also validate for typos in keys
     question: Optional[str]
     schema: Optional[str]
     answer: Union[bool, int, float, str] = Field(..., description="Answer value, type depends on schema")
 
-    class Config:
-        extra = "forbid"  # Disallow unexpected fields, to also validate for typos in keys
-
 
 class SubmissionSchema(BaseModel):
+    model_config = ConfigDict(extra='forbid')
     team_name: str
     contact_mail_address: str
     submission: List[AnswerItem]
-
-    class Config:
-        extra = "forbid"
 
 
 def is_valid_email(email: str) -> bool:
@@ -159,7 +156,7 @@ def process_submission(submission: SubmissionSchema) -> dict:
     and stores the submission in the database.
     """
 
-    if os.getenv("DEVELOPMENT"): logging.info(f"Processing submission: {submission}")
+    if DEV: logging.info(f"Processing submission: {submission}")
 
     # Generate a signature
     submission_bytes = str(submission.model_dump()).encode("utf-8")
@@ -187,7 +184,7 @@ def process_submission(submission: SubmissionSchema) -> dict:
 
 @app.get("/", response_class=HTMLResponse)
 async def serve_index(request: Request):
-    return templates.TemplateResponse("index.html", {"request": request})
+    return templates.TemplateResponse(request, "index.html")
 
 
 @app.post("/check-submission-ui")
@@ -201,31 +198,28 @@ async def check_submission(content: str = Form(...)):
 
 @app.post("/check-submission")
 async def check_submission(file: UploadFile):
+    if not file.filename.endswith('.json'):
+        raise HTTPException(status_code=400, detail="Uploaded file must be a JSON file.")
     try:
-        # Ensure the file is a JSON file
-        if not file.filename.endswith('.json'):
-            raise HTTPException(status_code=400, detail="Uploaded file must be a JSON file.")
-
         content = await file.read()
-        submission = get_submission_schema(content)
-        issues = validate_submission(submission)
-
-        if issues:
-            return {"status": "issues found", "issues": issues}
-        else:
-            return {"status": "valid submission",
-                    "message": "No issues with submission file found. Ready to submit via /submit endpoint"}
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"An error occurred: {str(e)}")
+
+    submission = get_submission_schema(content)
+    issues = validate_submission(submission)
+
+    if issues:
+        return {"status": "issues found", "issues": issues}
+    else:
+        return {"status": "valid submission",
+                "message": "No issues with submission file found. Ready to submit via /submit endpoint"}
 
 
 @app.post("/submit")
 async def submit(file: UploadFile):
+    if not file.filename.endswith('.json'):
+        raise HTTPException(status_code=400, detail="Uploaded file must be a JSON file.")
     try:
-        # Ensure the file is a JSON file
-        if not file.filename.endswith('.json'):
-            raise HTTPException(status_code=400, detail="Uploaded file must be a JSON file.")
-
         content = await file.read()
         submission = get_submission_schema(content)
         issues = validate_submission(submission)  # Parse and validate form input
