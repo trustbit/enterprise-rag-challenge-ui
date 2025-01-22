@@ -11,6 +11,12 @@
   <link rel="stylesheet" href="static/style.css">
 </head>
 <body>
+<div class="success-banner" id="successBanner">
+  <span class="close-button" onclick="hideBanner()">×</span>
+  <p><b>Answers submitted!</b></p>
+  <p id="id-signature-submission"></p>
+</div>
+
 <div class="header">
   <img src="static/ERC_header_8.png" alt="Logo">
 </div>
@@ -298,15 +304,10 @@ if __name__ == "__main__":
             "Signature: " + result.response.signature + "\n\n"
         );
       }
-      const existingBanner = document.querySelector(".success-banner");
-      if (!existingBanner) {
-        const banner = document.createElement("div");
-        banner.classList.add("success-banner");
-        // TODO make this more pretty, maybe create template div, with display none and then fill it with the data
-        // banner.textContent = "Answers successfully submitted!";
-        banner.innerHTML = "<p>Answers successfully submitted!</p><p>ID: " + result.response.id + "</p><p>Signature: " + result.response.signature + "</p>";
-        document.body.insertBefore(banner, document.body.firstChild);
-      }
+      const successBanner = document.querySelector(".success-banner");
+      successBanner.style.display = "block";
+      const bannerSubmitData = document.querySelector("#id-signature-submission")
+      bannerSubmitData.innerHTML = "ID: " + result.response.id + "<br>Signature: " + result.response.signature;
     }
     await loadSubmissions();
   });
