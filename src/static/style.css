@@ -30,6 +30,25 @@ body {
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
+.footer {
+    text-align: center;
+    margin-top: 120px;
+    margin-bottom: 40px;
+}
+
+.footer p {
+    color: #9c9c9c;
+    font-size: 0.8rem;
+}
+
+.footer img {
+    width: 15vw;
+    min-width: 50px;
+    max-width: 300px;
+    margin: 20px auto;
+    display: block;
+}
+
 h1 {
     color: #333;
     text-align: center;
