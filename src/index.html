@@ -291,22 +291,22 @@ if __name__ == "__main__":
             "Issues: " + result.issues.join("") + "\n\n" +
             "ID: " + result.response.id + "\n\n" +
             "Signature: " + result.response.signature + "\n\n"
-            );
+        );
       } else if (result.status === "success") {
         alert("Submission successful!" + "\n\n" +
             "ID: " + result.response.id + "\n\n" +
             "Signature: " + result.response.signature + "\n\n"
-            );
+        );
       }
       const existingBanner = document.querySelector(".success-banner");
-        if (!existingBanner) {
-          const banner = document.createElement("div");
-          banner.classList.add("success-banner");
-          // TODO make this more pretty, maybe create template div, with display none and then fill it with the data
-          // banner.textContent = "Answers successfully submitted!";
-          banner.innerHTML = "<p>Answers successfully submitted!</p><p>ID: " + result.response.id + "</p><p>Signature: " + result.response.signature + "</p>";
-          document.body.insertBefore(banner, document.body.firstChild);
-        }
+      if (!existingBanner) {
+        const banner = document.createElement("div");
+        banner.classList.add("success-banner");
+        // TODO make this more pretty, maybe create template div, with display none and then fill it with the data
+        // banner.textContent = "Answers successfully submitted!";
+        banner.innerHTML = "<p>Answers successfully submitted!</p><p>ID: " + result.response.id + "</p><p>Signature: " + result.response.signature + "</p>";
+        document.body.insertBefore(banner, document.body.firstChild);
+      }
     }
     await loadSubmissions();
   });
