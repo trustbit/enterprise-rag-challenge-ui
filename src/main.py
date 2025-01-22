@@ -1,15 +1,15 @@
+import json
+import os
+import re
+import logging
+import hashlib
 from fastapi import FastAPI, Form, HTTPException, UploadFile, Request
 from fastapi.responses import HTMLResponse, JSONResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from pydantic import BaseModel, ValidationError, Field, ConfigDict
 from typing import Optional, List, Union
-import json
-import os
-import re
-import uuid
-import time
-import logging
+from tsp_client import TSPSigner, TSPVerifier, SigningSettings
 from dotenv import load_dotenv
 
 # TODO set env variables!
@@ -138,25 +138,43 @@ def get_submission_schema(content: str | bytes) -> SubmissionSchema:
         raise HTTPException(status_code=400, detail=f"Invalid JSON or schema: {str(e)}")
 
 
-def sign_with_timestamp_server(payload_bytes: bytes) -> str:
+def sign_with_tsp_server(submission: SubmissionSchema) -> [str, str, str]:
     """
     Mock signature. Replace this with a real TSP call if needed.
     e.g. using 'tsp-client' library:
 
         from tsp import TimeStampClient
-        tsp_client = TimeStampClient("https://tsa.example.com")
-        tsp_response = tsp_client.request_tsa(payload_bytes)
+        tsp_client = TimeStampClient("https://tsp.example.com")
+        tsp_response = tsp_client.request_tsp(payload_bytes)
         return tsp_response.time_stamp_token.hex()  # or something similar
     """
-    mock_hash = str(abs(hash(payload_bytes)))
-    return mock_hash
+    submission_bytes = str(submission.model_dump()).encode("utf-8")
+    digest = hashlib.sha512(submission_bytes).digest()
+
+    signer = TSPSigner()
+    if os.getenv("TSP_URL"):
+        if DEV: logger.info("Signing with specified TSP server...")
+        signing_settings = SigningSettings(tsp_server=os.getenv("TSP_URL"))
+        signature = signer.sign(message_digest=digest, signing_settings=signing_settings)
+    else:
+        if DEV: logger.info("Signing with default TSP server...")
+        signature = signer.sign(message_digest=digest)
+
+    verified = TSPVerifier().verify(signature, message_digest=digest)
+    if DEV:
+        logger.info("Signature verification:")
+        logger.info(verified.tst_info)  # Parsed TSTInfo (CMS SignedData) structure
+        logger.info("")
+        logger.info(verified.signed_attrs)  # Parsed CMS SignedAttributes structure
+
+    return signature.hex(), digest.hex(), verified.tst_info["gen_time"].strftime("%Y-%m-%d, %H:%M:%S")
 
 
 def store_submission(record: dict):
     """
     Store a submission record as JSON locally in SUBMISSIONS_PATH.
     """
-    with open(os.path.join(os.getenv("SUBMISSIONS_PATH"), f"{record['id']}.json"), "w", encoding="utf-8") as f:
+    with open(os.path.join(os.getenv("SUBMISSIONS_PATH"), f"{record['signature'][:64]}.json"), "w", encoding="utf-8") as f:
         json.dump(record, f, indent=4)
 
 
@@ -168,28 +186,29 @@ def process_submission(submission: SubmissionSchema) -> dict:
     """
 
     # Generate a signature
-    submission_bytes = str(submission.model_dump()).encode("utf-8")
-    signature = sign_with_timestamp_server(submission_bytes)
+    tsp_signature, digest, timestamp = sign_with_tsp_server(submission)
+    signature = hashlib.sha256(tsp_signature.encode("utf-8")).hexdigest()
 
-    # Build a record
-    submission_id = str(uuid.uuid4())
-    now_str = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
+    # metadata = {"tsp_server": os.getenv("TSP_URL"), "hash_algorithm": "SHA-512", "string_encoding": "hexadecimal",
+    # UTC time}
 
     record = {
         "team_name": submission.team_name,
         "contact_mail_address": submission.contact_mail_address,
-        "time": now_str,
-        "id": submission_id,
-        "signature": signature,
+        "time": timestamp,
+        "signature": signature,  # sha256 of tsp signature
+        "tsp_signature": tsp_signature,
+        "submission_digest": digest,
         "submission": submission.model_dump()["submission"],
     }
 
     store_submission(record)
 
     return {
-        "id": submission_id,
-        "time": now_str,
-        "signature": signature,
+        "team_name": submission.team_name,
+        "time": timestamp,
+        "signature": signature[:64],  # only publish first 64 characters
+        "tsp_signature": tsp_signature,
         # "submission": submission.model_dump()["submission"],
     }
 
@@ -243,11 +262,11 @@ async def submit(file: UploadFile):
                                "Consider submitting again adhering to the submission guidelines. Use the identical "
                                "team name and mail address to overwrite this submission.",
                     "issues": issues,
-                    "response": response}
+                    "response": response}   # TODO update! add full tsp signature
         else:
             return {"status": "success",
                     "message": "Successfully submitted! Verify on submissions table",
-                    "response": response}
+                    "response": response}   # TODO update! add full tsp signature
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"An error occurred: {str(e)}")
 
@@ -283,7 +302,7 @@ def get_submissions():
         with open(os.path.join(os.getenv("SUBMISSIONS_PATH"), file), "r", encoding="utf-8") as f:
             submission = json.load(f)
             # TODO update which variables should be sent to frontend for data security and efficiency
-            submission = {k: v for k, v in submission.items() if k in ["team_name", "id", "time", "signature"]}
+            submission = {k: v for k, v in submission.items() if k in ["time", "team_name", "signature"]}
             submissions_db.append(submission)
-
+    submissions_db = sorted(submissions_db, key=lambda x: x["time"], reverse=True)
     return JSONResponse(submissions_db)

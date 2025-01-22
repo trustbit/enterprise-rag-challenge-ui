@@ -33,7 +33,6 @@
   async function loadSubmissions() {
     const resp = await fetch("/submissions");
     const data = await resp.json();
-    data.reverse();
 
     const tbody = document.querySelector("#submissionsTable tbody");
     tbody.innerHTML = "";
@@ -46,7 +45,7 @@
       row.appendChild(timeCell);
 
       const idCell = document.createElement("td");
-      idCell.textContent = entry.id;
+      idCell.textContent = entry.team_name;
       row.appendChild(idCell);
 
       const sigCell = document.createElement("td");
@@ -140,19 +139,19 @@
         alert("Successfully submitted with issues!\n\nConsider submitting again adhering to the submission " +
             "guidelines. Use the identical team name and mail address to overwrite this submission. \n\n" +
             "Issues: " + result.issues.join("") + "\n\n" +
-            "ID: " + result.response.id + "\n\n" +
+            "Team: " + result.response.team_name + "\n\n" +
             "Signature: " + result.response.signature + "\n\n"
         );
       } else if (result.status === "success") {
         alert("Submission successful!" + "\n\n" +
-            "ID: " + result.response.id + "\n\n" +
+            "Team: " + result.response.team_name + "\n\n" +
             "Signature: " + result.response.signature + "\n\n"
         );
       }
       const successBanner = document.querySelector(".success-banner");
       successBanner.style.display = "block";
       const bannerSubmitData = document.querySelector("#id-signature-submission")
-      bannerSubmitData.innerHTML = "ID: " + result.response.id + "<br>Signature: " + result.response.signature;
+      bannerSubmitData.innerHTML = "Team: " + result.response.team_name + "<br>Signature: " + result.response.signature;
     }
     await loadSubmissions();
   });
