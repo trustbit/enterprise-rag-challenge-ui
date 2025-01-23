@@ -170,10 +170,20 @@ def sign_with_tsp_server(submission: SubmissionSchema) -> [str, str, str]:
     return signature.hex(), digest.hex(), verified.tst_info["gen_time"].strftime("%Y-%m-%d, %H:%M:%S")
 
 
-def store_submission(record: dict):
+def store_submission(submission: SubmissionSchema, signature: str, tsp_signature: str, digest: str, timestamp: str):
     """
     Store a submission record as JSON locally in SUBMISSIONS_PATH.
     """
+    record = {
+        "team_name": submission.team_name,
+        "contact_mail_address": submission.contact_mail_address,
+        "time": timestamp,
+        "signature": signature,  # sha256 of tsp signature
+        "tsp_signature": tsp_signature,
+        "submission_digest": digest,
+        "submission": submission.model_dump()["submission"],
+    }
+
     with open(os.path.join(os.getenv("SUBMISSIONS_PATH"), f"{record['signature'][:64]}.json"), "w", encoding="utf-8") as f:
         json.dump(record, f, indent=4)
 
@@ -192,17 +202,7 @@ def process_submission(submission: SubmissionSchema) -> dict:
     # metadata = {"tsp_server": os.getenv("TSP_URL"), "hash_algorithm": "SHA-512", "string_encoding": "hexadecimal",
     # UTC time}
 
-    record = {
-        "team_name": submission.team_name,
-        "contact_mail_address": submission.contact_mail_address,
-        "time": timestamp,
-        "signature": signature,  # sha256 of tsp signature
-        "tsp_signature": tsp_signature,
-        "submission_digest": digest,
-        "submission": submission.model_dump()["submission"],
-    }
-
-    store_submission(record)
+    store_submission(submission, signature, tsp_signature, digest, timestamp)
 
     return {
         "team_name": submission.team_name,
