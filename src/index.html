@@ -197,7 +197,25 @@ if __name__ == "__main__":
           Copy
         </button>
         <pre id="python-tsp-code-submit">
-TODO ADD
+# TODO ADD
+# paste verification data copied from UI here
+# tsp_verification_data = None
+
+signature = bytes.fromhex(tsp_verification_data['tsp_signature'])
+server_digest = bytes.fromhex(tsp_verification_data['digest'])
+
+submission_bytes = str(tsp_verification_data['submission']).encode("utf-8")
+current_digest = hashlib.sha512(submission_bytes).digest()
+
+# assert current_digest == server_digest, "Digest mismatch. Digest computed now from submission data does not match the digest in the verification data."
+
+verified = TSPVerifier().verify(signature, message_digest=current_digest)
+
+print(verified.tst_info)  # Parsed TSTInfo (CMS SignedData) structure
+print("")
+print(verified.signed_attrs)  # Parsed CMS SignedAttributes structure
+print("Submission timestamp:", verified.tst_info["gen_time"].strftime("%Y-%m-%d, %H:%M:%S"))
+# If no DigestMismatchError, the verification is successful.
           </pre>
       </div>
     </div>
