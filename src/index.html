@@ -24,6 +24,27 @@
 <div class="content">
   <h1>Answer Submission</h1>
 
+  <!-- Instructions -->
+  <div class="collapsible-section">
+    <button class="section-header">
+      <svg class="arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M6 9l6 6 6-6" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+      <h2>Instructions</h2>
+    </button>
+    <div class="section-content">
+      <p id="intro-text">
+        In order to submit your answers, please adhere to the submission guidelines (TODO add link).<br>
+        <br>
+        You can either submit your answers manually via the form below or use the API. Make sure to
+        check your submission before the final upload for any issues that could affect the scoring of your answers.<br>
+        <br>
+        Your submission will be validated via <a href="https://github.com/pyauth/tsp-client" target="_blank">TSP</a>.
+        If you want to check the correct submission after uploading, make sure to store the full signature displayed
+        after submission and see the code snipped below to perform verification.
+      </p>
+    </div>
+  </div>
 
   <!-- Manual Submission -->
   <div class="collapsible-section">
