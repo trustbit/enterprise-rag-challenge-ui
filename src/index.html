@@ -108,11 +108,13 @@ curl -X 'POST' \
         <pre id="python-code-check">
 import requests
 
+SUBMISSION_JSON_PATH = r"C:\Users\felix.krause\code\trustbit\enterprise-rag-challenge-ui\test\samples\sample_answer.json"
+
 def main():
     url = "http://127.0.0.1:8000/check-submission"
     headers = {"accept": "application/json"}
     files = {
-        "file": ("sample_answer.json", open(r"C:\Users\felix.krause\code\trustbit\enterprise-rag-challenge-ui\test\samples\sample_answer.json", "rb"), "application/json")
+        "file": ("sample_answer.json", open(SUBMISSION_JSON_PATH, "rb"), "application/json")
     }
     response = requests.post(url, headers=headers, files=files)
     assert response.status_code == 200
@@ -158,11 +160,13 @@ curl -X 'POST' \
         <pre id="python-code-submit">
 import requests
 
+SUBMISSION_JSON_PATH = r"C:\Users\felix.krause\code\trustbit\enterprise-rag-challenge-ui\test\samples\sample_answer.json"
+
 def main():
     url = "http://127.0.0.1:8000/submit"
     headers = {"accept": "application/json"}
     files = {
-        "file": ("sample_answer.json", open(r"C:\Users\felix.krause\code\trustbit\enterprise-rag-challenge-ui\test\samples\sample_answer.json", "rb"), "application/json")
+        "file": ("sample_answer.json", open(SUBMISSION_JSON_PATH, "rb"), "application/json")
     }
     response = requests.post(url, headers=headers, files=files)
     assert response.status_code == 200
@@ -212,7 +216,7 @@ TODO ADD
       <table id="submissionsTable">
         <thead>
         <tr>
-          <th>Time</th>
+          <th>Time (UTC)</th>
           <th>Team Name</th>
           <th>Signature</th>
         </tr>
@@ -225,7 +229,7 @@ TODO ADD
 </div>
 
 <div class="footer">
-  <img src="static/TAT-WHITE_TIMETOACT-AT.png" alt="Logo">
+  <a href="https://www.timetoact-group.at/" target="_blank"><img src="static/TAT-WHITE_TIMETOACT-AT.png" alt="Logo"></a>
   <p>© 2025 TIMETOACT GROUP Österreich GmbH</p>
 </div>
 

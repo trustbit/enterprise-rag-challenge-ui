@@ -6,6 +6,7 @@ body {
     background-size: cover;
     background-attachment: fixed;
     background-position: center;
+    font-size: 1rem;
 }
 
 .header {
@@ -52,7 +53,7 @@ body {
 h1 {
     color: #333;
     text-align: center;
-    margin: 0;
+    margin: 0 0 50px 0;
     font-weight: 550;
     font-size: 1.8rem;
 }
@@ -68,6 +69,7 @@ pre {
     padding: 10px;
     border-radius: 4px;
     overflow-x: auto;
+    font-size: 0.8rem;
 }
 
 form, table {
