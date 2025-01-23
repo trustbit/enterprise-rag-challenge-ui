@@ -209,6 +209,8 @@ def process_submission(submission: SubmissionSchema) -> dict:
         "time": timestamp,
         "signature": signature[:64],  # only publish first 64 characters
         "tsp_signature": tsp_signature,
+        "tsp_verification_data": {"timestamp": timestamp, "digest": digest, "tsp_signature": tsp_signature,
+                                  "submission": str(submission.model_dump())},
         # "submission": submission.model_dump()["submission"],
     }
 

@@ -150,8 +150,10 @@
       }
       const successBanner = document.querySelector(".success-banner");
       successBanner.style.display = "block";
-      const bannerSubmitData = document.querySelector("#id-signature-submission")
+      const bannerSubmitData = document.querySelector("#submission-data")
       bannerSubmitData.innerHTML = "Team: " + result.response.team_name + "<br>Signature: " + result.response.signature;
+      const bannerSubmitTspData = document.querySelector("#tsp-verification-data")
+      bannerSubmitTspData.textContent = JSON.stringify(result.response.tsp_verification_data);
     }
     await loadSubmissions();
   });

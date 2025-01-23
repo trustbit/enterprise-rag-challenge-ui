@@ -14,7 +14,9 @@
 <div class="success-banner" id="successBanner">
   <span class="close-button" onclick="hideBanner()">×</span>
   <p><b>Answers submitted!</b></p>
-  <p id="id-signature-submission"></p>
+  <p id="submission-data"></p>
+  <p id="tsp-verification-data" style="display: none"></p>
+  <button type="button" id="copy-tsp-button" class="copy-button" onclick="copyCode('tsp-verification-data')">Copy data for TSP verification</button>
 </div>
 
 <div class="header">
@@ -88,7 +90,7 @@
     <div class="section-content hidden">
       <p>With curl:</p>
       <div class="code-container">
-        <button class="copy-button" onclick="copyCode('curl-code-check')">
+        <button class="copy-button copy-code-button" onclick="copyCode('curl-code-check')">
           Copy
         </button>
         <pre id="curl-code-check">
@@ -102,7 +104,7 @@ curl -X 'POST' \
 
       <p>With Python requests:</p>
       <div class="code-container">
-        <button class="copy-button" onclick="copyCode('python-code-check')">
+        <button class="copy-button copy-code-button" onclick="copyCode('python-code-check')">
           Copy
         </button>
         <pre id="python-code-check">
@@ -140,7 +142,7 @@ if __name__ == "__main__":
     <div class="section-content hidden">
       <p>With curl:</p>
       <div class="code-container">
-        <button class="copy-button" onclick="copyCode('curl-code-submit')">
+        <button class="copy-button copy-code-button" onclick="copyCode('curl-code-submit')">
           Copy
         </button>
         <pre id="curl-code-submit">
@@ -154,7 +156,7 @@ curl -X 'POST' \
 
       <p>With Python requests:</p>
       <div class="code-container">
-        <button class="copy-button" onclick="copyCode('python-code-submit')">
+        <button class="copy-button copy-code-button" onclick="copyCode('python-code-submit')">
           Copy
         </button>
         <pre id="python-code-submit">
@@ -191,7 +193,7 @@ if __name__ == "__main__":
     <div class="section-content hidden">
       <p>With Python:</p>
       <div class="code-container">
-        <button class="copy-button" onclick="copyCode('python-tsp-code-submit')">
+        <button class="copy-button copy-code-button" onclick="copyCode('python-tsp-code-submit')">
           Copy
         </button>
         <pre id="python-tsp-code-submit">
