@@ -36,8 +36,7 @@ curl -X 'POST' \
   -F 'file=@test/samples/sample_answer.json;type=application/json'
 ```
 
-## DEV - TODOs
-NEW Schema
+## Schema
 ```json
 {
 "team_name": "xy",
@@ -51,10 +50,3 @@ NEW Schema
     ]
 }
 ```
-
-**TODOs:**
-- table: time, name, signature (from TSP, with http call)
-  - when submitting compute hash of whole submission, keep digest secret show (public) signature (still needed?)
-- Hash secret (show only to team) - assign random ID for questionaire
-- extra questionaire: add submission ID/signature hash, which LLMs, architecture, etc. (Google Form?)
-- think about overall user story (how to make everything clear, links to what to do next)
