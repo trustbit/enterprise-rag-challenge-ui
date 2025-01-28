@@ -155,6 +155,7 @@
       const bannerSubmitTspData = document.querySelector("#tsp-verification-data")
       bannerSubmitTspData.textContent = JSON.stringify(result.response.tsp_verification_data);
 
+      // scroll to top to show submission success banner
       window.scrollTo(0, 0);
     }
     await loadSubmissions();
