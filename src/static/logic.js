@@ -154,6 +154,8 @@
       bannerSubmitData.innerHTML = "Team: " + result.response.team_name + "<br>Signature: " + result.response.signature;
       const bannerSubmitTspData = document.querySelector("#tsp-verification-data")
       bannerSubmitTspData.textContent = JSON.stringify(result.response.tsp_verification_data);
+
+      window.scrollTo(0, 0);
     }
     await loadSubmissions();
   });
