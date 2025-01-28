@@ -191,15 +191,13 @@ def store_submission(submission: SubmissionSchema, signature: str, tsp_signature
 
 
 def process_submission(submission: SubmissionSchema) -> dict:
-    # TODO split into process and store submission functions
     """
     Processes a validated submission, generates a signature,
     and stores the submission in the database.
     """
 
-    # Generate a signature
     tsp_signature, digest, timestamp = sign_with_tsp_server(submission)
-    # signature = hashlib.sha256(tsp_signature.encode("utf-8")).hexdigest()
+    # signature = hashlib.sha256(tsp_signature.encode("utf-8")).hexdigest()  # TODO could also hash signature for higher privacy?
 
     store_submission(submission, tsp_signature[:32], tsp_signature, digest, timestamp)
 
@@ -302,7 +300,6 @@ def get_submissions():
     for file in files:
         with open(os.path.join(os.getenv("SUBMISSIONS_PATH"), file), "r", encoding="utf-8") as f:
             submission = json.load(f)
-            # TODO update which variables should be sent to frontend for data security and efficiency
             submission = {k: v for k, v in submission.items() if k in ["time", "team_name", "signature"]}
             submissions_db.append(submission)
     submissions_db = sorted(submissions_db, key=lambda x: x["time"], reverse=True)
