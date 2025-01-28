@@ -52,6 +52,15 @@ curl -X 'POST' \
 
 Run the file [`submit_via_API.py`](submit_via_API.py).
 
+### Run unittests
+Note, that running the tests will generate two submissions, which will 
+be stored in the specified path 
+
+```bash
+pytest
+```
+
+
 ## Schema
 
 ```json
