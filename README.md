@@ -38,7 +38,7 @@ curl -X 'POST' \
   -d 'content=%5B%7B%22question%22%3A%22Q1%22%2C%22schema%22%3A%22name%22%2C%22answer%22%3A%22A1%22%7D%2C%7B%22question%22%3A%22Q2%22%2C%22schema%22%3A%22number%22%2C%22answer%22%3A2.5%7D%2C%7B%22question%22%3A%22Q2%22%2C%22schema%22%3A%22boolean%22%2C%22answer%22%3Atrue%7D%5D'
 ```
 
-### Test file submission (json)
+### Test json file submission
 
 ```bash
 curl -X 'POST' \
@@ -48,7 +48,7 @@ curl -X 'POST' \
   -F 'file=@test/samples/sample_answer.json;type=application/json'
 ```
 
-### Test file check and submission with python
+### Test submission data check and submission with python
 
 Run the file [`submit_via_API.py`](submit_via_API.py).
 
