@@ -25,12 +25,6 @@ if DEV:
 app.mount("/static", StaticFiles(directory="src/static"), name="static")
 templates = Jinja2Templates(directory="src/")
 
-if DEV:
-    pass
-    # delete current json files
-    # for file in os.listdir("submissions"):
-    #     os.remove(f"submissions/{file}")
-
 with open(os.getenv("CORRECT_QUESTIONS_PATH"), "r", encoding="utf-8") as f:
     true_questions = json.load(f)
 
@@ -98,7 +92,7 @@ def validate_answer(schema: Optional[str], answer: any) -> tuple[any, Optional[s
 def validate_submission(submission: SubmissionSchema) -> list:
     issues_questions = []
     issues_schema = []
-    logger.info(f"CHECK_QUESTIONS: {os.getenv('CHECK_QUESTIONS')}")
+    if DEV: logger.info(f"CHECK_QUESTIONS: {os.getenv('CHECK_QUESTIONS')}")
 
     # checking email address
     if is_valid_email(submission.contact_mail_address):
@@ -139,19 +133,11 @@ def get_submission_schema(content: str | bytes) -> SubmissionSchema:
 
 
 def sign_with_tsp_server(submission: SubmissionSchema) -> [str, str, str]:
-    """
-    Mock signature. Replace this with a real TSP call if needed.
-    e.g. using 'tsp-client' library:
-
-        from tsp import TimeStampClient
-        tsp_client = TimeStampClient("https://tsp.example.com")
-        tsp_response = tsp_client.request_tsp(payload_bytes)
-        return tsp_response.time_stamp_token.hex()  # or something similar
-    """
     submission_bytes = str(submission.model_dump()).encode("utf-8")
     digest = hashlib.sha512(submission_bytes).digest()
 
     signer = TSPSigner()
+
     if os.getenv("TSP_URL"):
         if DEV: logger.info("Signing with specified TSP server...")
         signing_settings = SigningSettings(tsp_server=os.getenv("TSP_URL"))
@@ -161,6 +147,7 @@ def sign_with_tsp_server(submission: SubmissionSchema) -> [str, str, str]:
         signature = signer.sign(message_digest=digest)
 
     verified = TSPVerifier().verify(signature, message_digest=digest)
+
     if DEV:
         logger.info("Signature verification:")
         logger.info(verified.tst_info)  # Parsed TSTInfo (CMS SignedData) structure
@@ -171,9 +158,7 @@ def sign_with_tsp_server(submission: SubmissionSchema) -> [str, str, str]:
 
 
 def store_submission(submission: SubmissionSchema, signature: str, tsp_signature: str, digest: str, timestamp: str):
-    """
-    Store a submission record as JSON locally in SUBMISSIONS_PATH.
-    """
+    """Store a submission record as JSON locally in SUBMISSIONS_PATH."""
     record = {
         "team_name": submission.team_name,
         "contact_mail_address": submission.contact_mail_address,
@@ -191,16 +176,10 @@ def store_submission(submission: SubmissionSchema, signature: str, tsp_signature
 
 
 def process_submission(submission: SubmissionSchema) -> dict:
-    """
-    Processes a validated submission, generates a signature,
-    and stores the submission in the database.
-    """
-
+    """Generates a signature and stores the submission in the database."""
     tsp_signature, digest, timestamp = sign_with_tsp_server(submission)
     # signature = hashlib.sha256(tsp_signature.encode("utf-8")).hexdigest()  # TODO could also hash signature for higher privacy?
-
     store_submission(submission, tsp_signature[:32], tsp_signature, digest, timestamp)
-
     return {
         "team_name": submission.team_name,
         "time": timestamp,
@@ -214,15 +193,6 @@ def process_submission(submission: SubmissionSchema) -> dict:
 @app.get("/", response_class=HTMLResponse)
 async def serve_index(request: Request):
     return templates.TemplateResponse(request, "index.html")
-
-
-@app.post("/check-submission-ui")
-async def check_submission(content: str = Form(...)):
-    submission = get_submission_schema(content)
-    issues = validate_submission(submission)
-    if issues:
-        return {"status": "issues found", "issues": issues}
-    return {"status": "valid submission"}
 
 
 @app.post("/check-submission")
@@ -242,6 +212,15 @@ async def check_submission(file: UploadFile):
     else:
         return {"status": "valid submission",
                 "message": "No issues with submission file found. Ready to submit via /submit endpoint"}
+
+
+@app.post("/check-submission-ui")
+async def check_submission(content: str = Form(...)):
+    submission = get_submission_schema(content)
+    issues = validate_submission(submission)
+    if issues:
+        return {"status": "issues found", "issues": issues}
+    return {"status": "valid submission"}
 
 
 @app.post("/submit")
