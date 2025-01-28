@@ -1,6 +1,8 @@
 # Enterprise RAG Challenge UI & Submission Handling
 Codebase for the Enterprise RAG Challenge UI and submission handling
 
+![UI_sample_image.png](UI_sample_image.png)
+
 ## Getting Started
 Install dependencies
 ```bash
