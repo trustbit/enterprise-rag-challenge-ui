@@ -82,16 +82,16 @@ def validate_answer(schema: Optional[str], answer: any) -> tuple[any, Optional[s
         try:
             return float(answer), None
         except ValueError:
-            return answer, f"Expected a number for schema 'number', got: {type(answer).__name__}"
+            return answer, f"Expected a number for schema 'number', got: '{answer}' ({type(answer).__name__})"
     if schema == "name" and not isinstance(answer, str):
-        return answer, f"Expected text for schema 'name', got: {type(answer).__name__}"
+        return answer, f"Expected text for schema 'name', got: '{answer}' ({type(answer).__name__})"
     if schema == "boolean":
         if isinstance(answer, str) and answer.lower() in ["true", "yes"]:
             return True, None
         elif isinstance(answer, str) and answer.lower() in ["false", "no"]:
             return False, None
         elif not isinstance(answer, bool):
-            return answer, f"Expected boolean for schema 'boolean', got: {type(answer).__name__}"
+            return answer, f"Expected boolean for schema 'boolean', got: '{answer}' ({type(answer).__name__})"
     return answer, None
 
 
@@ -262,13 +262,14 @@ async def submit(file: UploadFile):
             return {"status": "issues found",
                     "message": "Successfully submitted! However, issues with submission file were detected. "
                                "Consider submitting again adhering to the submission guidelines. Use the identical "
-                               "team name and mail address to overwrite this submission.",
+                               "team name and mail address to overwrite this submission. Verify submission on "
+                               "submissions table and/or with TSP!",
                     "issues": issues,
-                    "response": response}   # TODO update! add full tsp signature
+                    "response": response}
         else:
             return {"status": "success",
-                    "message": "Successfully submitted! Verify on submissions table",
-                    "response": response}   # TODO update! add full tsp signature
+                    "message": "Successfully submitted! Verify on submissions table and/or with TSP!",
+                    "response": response}
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"An error occurred: {str(e)}")
 

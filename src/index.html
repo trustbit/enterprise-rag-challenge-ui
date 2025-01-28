@@ -16,7 +16,9 @@
   <p><b>Answers submitted!</b></p>
   <p id="submission-data"></p>
   <p id="tsp-verification-data" style="display: none"></p>
-  <button type="button" id="copy-tsp-button" class="copy-button" onclick="copyCode('tsp-verification-data')">Copy data for TSP verification</button>
+  <button type="button" id="copy-tsp-button" class="copy-button" onclick="copyCode('tsp-verification-data')">Copy data
+    for TSP verification
+  </button>
 </div>
 
 <div class="header">
@@ -110,7 +112,7 @@ curl -X 'POST' \
         <pre id="python-code-check">
 import requests
 
-SUBMISSION_JSON_PATH = r"C:\Users\felix.krause\code\trustbit\enterprise-rag-challenge-ui\test\samples\sample_answer.json"
+SUBMISSION_JSON_PATH = r"test\samples\sample_answer.json"
 
 def main():
     url = "http://127.0.0.1:8000/check-submission"
@@ -140,6 +142,8 @@ if __name__ == "__main__":
       <h2>Submit via API</h2>
     </button>
     <div class="section-content hidden">
+      <p>Make sure to store the response (i.p. "tsp_verification_data") of the API call if you want to verify the
+        submission via TSP.</p>
       <p>With curl:</p>
       <div class="code-container">
         <button class="copy-button copy-code-button" onclick="copyCode('curl-code-submit')">
@@ -162,7 +166,7 @@ curl -X 'POST' \
         <pre id="python-code-submit">
 import requests
 
-SUBMISSION_JSON_PATH = r"C:\Users\felix.krause\code\trustbit\enterprise-rag-challenge-ui\test\samples\sample_answer.json"
+SUBMISSION_JSON_PATH = r"test\samples\sample_answer.json"
 
 def main():
     url = "http://127.0.0.1:8000/submit"
@@ -182,7 +186,7 @@ if __name__ == "__main__":
   </div>
 
 
-<!-- Verify submission with TSP -->
+  <!-- Verify submission with TSP -->
   <div class="collapsible-section">
     <button class="section-header">
       <svg class="arrow collapsed" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -191,15 +195,16 @@ if __name__ == "__main__":
       <h2>Verify submission with TSP</h2>
     </button>
     <div class="section-content hidden">
+      <p>Make sure to copy the verification data either with the button at the top when submitted via UI or from
+        the terminal if submitted via API!</p>
       <p>With Python:</p>
       <div class="code-container">
         <button class="copy-button copy-code-button" onclick="copyCode('python-tsp-code-submit')">
           Copy
         </button>
         <pre id="python-tsp-code-submit">
-# TODO ADD
 # paste verification data copied from UI here
-# tsp_verification_data = None
+tsp_verification_data = {}
 
 signature = bytes.fromhex(tsp_verification_data['tsp_signature'])
 server_digest = bytes.fromhex(tsp_verification_data['digest'])
@@ -207,15 +212,15 @@ server_digest = bytes.fromhex(tsp_verification_data['digest'])
 submission_bytes = str(tsp_verification_data['submission']).encode("utf-8")
 current_digest = hashlib.sha512(submission_bytes).digest()
 
-# assert current_digest == server_digest, "Digest mismatch. Digest computed now from submission data does not match the digest in the verification data."
+assert current_digest == server_digest, ("Digest mismatch. Digest computed from "
+ "submission data does not match the digest in the verification data. Check if "
+ "the verification data is correct. Submit again if you suspect tampering.")
 
 verified = TSPVerifier().verify(signature, message_digest=current_digest)
 
-print(verified.tst_info)  # Parsed TSTInfo (CMS SignedData) structure
-print("")
-print(verified.signed_attrs)  # Parsed CMS SignedAttributes structure
 print("Submission timestamp:", verified.tst_info["gen_time"].strftime("%Y-%m-%d, %H:%M:%S"))
-# If no DigestMismatchError, the verification is successful.
+print(verified.signed_attrs)
+# If there is no DigestMismatchError returned, the verification is successful.
           </pre>
       </div>
     </div>
