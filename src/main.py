@@ -197,18 +197,14 @@ def process_submission(submission: SubmissionSchema) -> dict:
 
     # Generate a signature
     tsp_signature, digest, timestamp = sign_with_tsp_server(submission)
-    signature = hashlib.sha256(tsp_signature.encode("utf-8")).hexdigest()
+    # signature = hashlib.sha256(tsp_signature.encode("utf-8")).hexdigest()
 
-    # metadata = {"tsp_server": os.getenv("TSP_URL"), "hash_algorithm": "SHA-512", "string_encoding": "hexadecimal",
-    # UTC time}
-
-    store_submission(submission, signature, tsp_signature, digest, timestamp)
+    store_submission(submission, tsp_signature[:32], tsp_signature, digest, timestamp)
 
     return {
         "team_name": submission.team_name,
         "time": timestamp,
-        "signature": signature[:64],  # only publish first 64 characters
-        "tsp_signature": tsp_signature,
+        "signature": tsp_signature[:32],  # only publish first 32 characters
         "tsp_verification_data": {"timestamp": timestamp, "digest": digest, "tsp_signature": tsp_signature,
                                   "submission": str(submission.model_dump())},
         # "submission": submission.model_dump()["submission"],
