@@ -36,6 +36,10 @@ curl -X 'POST' \
   -F 'file=@test/samples/sample_answer.json;type=application/json'
 ```
 
+### Test file check and submission with python
+Run the file [`submit_via_API.py`](submit_via_API.py).    
+
+
 ## Schema
 ```json
 {
@@ -46,7 +50,10 @@ curl -X 'POST' \
       { "question": "Q1", "schema": "name", "answer": "A1" },
       { "question": "Q2", "schema": "number", "answer": 2.5 },
       { "question": "Q2", "schema": "boolean", "answer": true },
-      { "question": "Q2", "schema": "boolean", "answer": "n/a" }
+      { "question": "Q2", "schema": "boolean", "answer": "n/a" },
+      ...
     ]
 }
 ```
+
+Also see the sample answer in the file [`sample_answer.json`](test/samples/sample_answer.json).
