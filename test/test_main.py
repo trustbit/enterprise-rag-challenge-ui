@@ -173,8 +173,8 @@ def test_submit_valid_submission(valid_submission_json):
     assert data["status"] in ["success", "issues found"]
     # Should return a response ID and signature
     assert "response" in data
-    assert "id" in data["response"]
     assert "signature" in data["response"]
+    assert "tsp_verification_data" in data["response"]
 
 
 def test_submissions_list_after_submit(valid_submission_json):
@@ -192,13 +192,12 @@ def test_submissions_list_after_submit(valid_submission_json):
     )
     submit_data = submit_response.json()
     assert submit_response.status_code == 200
-    assert "id" in submit_data["response"]
+    assert "tsp_verification_data" in submit_data["response"]
 
     # Now get /submissions
     get_response = client.get("/submissions")
     assert get_response.status_code == 200
     submissions_list = get_response.json()
-    # We just check that we have at least one item with the matching id
-    last_id = submit_data["response"]["id"]
-    assert any(s["id"] == last_id for s in submissions_list), \
+    last_id = submit_data["response"]["signature"]
+    assert any(s["signature"] == last_id for s in submissions_list), \
         "Expected newly submitted id to be in the submissions list."
