@@ -1,3 +1,4 @@
+import json
 import pytest
 from fastapi.testclient import TestClient
 from src.main import app  # Adjust if your main file is named differently
@@ -41,18 +42,6 @@ def test_check_submission_correct_json(valid_submission_json):
     """
     Test /check-submission with correct submission JSON file.
     """
-    # # We can simulate file upload by passing (filename, file-like, content_type)
-    # response = client.post(
-    #     "/check-submission",
-    #     files={"file": ("valid.json",
-    #                     pytest.lazy_fixture('valid_submission_json'),
-    #                     "application/json")}
-    # )
-    # # Note: Above, lazy_fixture won't directly serialize dict -> JSON.
-    # # For test correctness, do:
-    # # files={"file": ("valid.json", json.dumps(valid_submission_json), "application/json")}
-
-    import json
     response = client.post(
         "/check-submission",
         files={"file": ("valid.json",
@@ -68,7 +57,6 @@ def test_check_submission_incorrect_filetype(valid_submission_json):
     """
     Test /check-submission with a non-.json file extension.
     """
-    import json
     response = client.post(
         "/check-submission",
         files={"file": ("invalid.txt",
@@ -95,7 +83,6 @@ def test_check_submission_wrong_answer_type():
             }
         ]
     }
-    import json
     response = client.post(
         "/check-submission",
         files={"file": ("invalid.json",
@@ -124,7 +111,7 @@ def test_check_submission_wrong_schema_key():
             }
         ]
     }
-    import json
+
     response = client.post(
         "/check-submission",
         files={"file": ("invalid.json",
@@ -144,7 +131,7 @@ def test_check_submission_invalid_email(valid_submission_json):
     """
     invalid_email_submission = valid_submission_json.copy()
     invalid_email_submission["contact_mail_address"] = "invalid-email-format"
-    import json
+
     response = client.post(
         "/check-submission",
         files={"file": ("invalid_email.json",
@@ -161,7 +148,6 @@ def test_submit_valid_submission(valid_submission_json):
     """
     Test /submit with a valid submission. It should return a success or partial success if issues were found.
     """
-    import json
     response = client.post(
         "/submit",
         files={"file": ("valid.json",
@@ -181,11 +167,7 @@ def test_submissions_list_after_submit(valid_submission_json):
     """
     Submit once and check if that new submission is in /submissions result.
     """
-    import json
-    # Clear or not? In-memory DB can't be easily cleared here, so we rely on the global state.
-    # We'll at least check that the last submission is appended.
 
-    # Submit
     submit_response = client.post(
         "/submit",
         files={"file": ("valid.json", json.dumps(valid_submission_json), "application/json")}
