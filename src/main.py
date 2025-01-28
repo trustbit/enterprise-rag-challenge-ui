@@ -183,8 +183,10 @@ def store_submission(submission: SubmissionSchema, signature: str, tsp_signature
         "submission_digest": digest,
         "submission": submission.model_dump()["submission"],
     }
+    clean_timestamp = timestamp.replace(":", "-").replace(", ", "-")
 
-    with open(os.path.join(os.getenv("SUBMISSIONS_PATH"), f"{record['signature'][:64]}.json"), "w", encoding="utf-8") as f:
+    with open(os.path.join(os.getenv("SUBMISSIONS_PATH"), f"{clean_timestamp}_{record['signature'][:64]}.json"), "w",
+              encoding="utf-8") as f:
         json.dump(record, f, indent=4)
 
 
