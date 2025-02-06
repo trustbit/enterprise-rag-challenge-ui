@@ -40,7 +40,7 @@ class SubmissionSchema(BaseModel):
     model_config = ConfigDict(extra='forbid')
     team_name: str
     contact_mail_address: str
-    submission: List[AnswerItem]
+    submission: List[AnswerItem] = Field(..., max_length=int(os.getenv("MAX_NR_OF_QUESTIONS")))
 
 
 def is_valid_email(email: str) -> bool:
@@ -126,6 +126,10 @@ def validate_submission(submission: SubmissionSchema) -> list:
 
 def get_submission_schema(content: str | bytes) -> SubmissionSchema:
     try:
+        if len(content) > int(os.getenv("MAX_JSON_SIZE")):
+            raise HTTPException(status_code=413,
+                                detail=f"JSON payload too large. Max size is {os.getenv('MAX_JSON_SIZE')} bytes.")
+
         data = json.loads(content)
         return SubmissionSchema(**data)
     except (json.JSONDecodeError, ValidationError) as e:
