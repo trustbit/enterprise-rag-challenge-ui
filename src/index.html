@@ -267,11 +267,16 @@ except Exception as e:
       <button type="button" id="loopLoadSubmissions" onclick="loopLoadSubmissions()">Reload every 2 sec</button>
       <table id="submissionsTable">
         <thead>
-        <tr>
-          <th>Time (UTC)</th>
-          <th>Team Name</th>
-          <th>Signature</th>
-        </tr>
+          <tr>
+            <th>Time (UTC)</th>
+            <th>Team Name</th>
+            <th>
+              <span class="tooltip signature">
+                Signature
+                <span class="tooltiptext">first 64 characters of sha256 digest of the tsp_signature</span>
+              </span>
+            </th>
+          </tr>
         </thead>
         <tbody>
         </tbody>
