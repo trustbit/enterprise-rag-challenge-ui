@@ -16,8 +16,8 @@
   <p><b>Answers submitted!</b></p>
   <p id="submission-data"></p>
   <p id="tsp-verification-data" style="display: none"></p>
-  <button type="button" id="copy-tsp-button" class="copy-button" onclick="copyCode('tsp-verification-data')">Copy data
-    for TSP verification
+  <button type="button" id="copy-tsp-button" class="copy-button" onclick="copyCode('tsp-verification-data')">
+    Copy data for TSP verification
   </button>
 </div>
 
@@ -42,29 +42,29 @@
           <strong>Adhere to the <a href="TODO add link" target="_blank">Submission Guidelines</a></strong>
         </li>
         <li>
-          <strong>Check Your Submission:</strong>
+          <strong>Check Your Submission</strong>
           <ul>
             <li>Validate your submission format for any issues that could impact scoring.</li>
           </ul>
         </li>
         <li>
-          <strong>Submit Answers:</strong>
+          <strong>Submit Answers</strong>
           <ul>
             <li>Use the manual submission form below, or</li>
             <li>Submit via the API.</li>
-            <li>Your submission will be validated using <a href="https://github.com/pyauth/tsp-client" target="_blank">TSP</a>.
-              Store the full verification data via API response or button on top after submission.
+            <li>Your submission will be timestamped using <a href="https://github.com/pyauth/tsp-client" target="_blank">TSP</a>.
+              To verify, store the full verification data via API response or button on top after UI submission.
             </li>
           </ul>
         </li>
         <li>
-          <strong>Verify Submission with TSP:</strong>
+          <strong>Verify Submission with TSP</strong>
           <ul>
             <li>Use the provided code snippet to verify your submission after uploading.</li>
           </ul>
         </li>
         <li>
-          <strong>Upload multiple submissions: (TODO DISCUSS)</strong>
+          <strong>Upload multiple submissions (TODO DISCUSS)</strong>
           <ul>
             <li>REPLACE old submission: use identical team name and e-mail address.</li>
             <li>ADD another submission: change team name (e.g. add a "_2" at the end).</li>
@@ -228,7 +228,10 @@ if __name__ == "__main__":
           Copy
         </button>
         <pre id="python-tsp-code-submit">
-# paste verification data copied from UI here
+import hashlib
+from tsp_client import TSPVerifier
+
+# PASTE TSP VERIFICATION DATA HERE (copied from UI or API response)
 tsp_verification_data = {}
 
 signature = bytes.fromhex(tsp_verification_data['tsp_signature'])
@@ -237,15 +240,14 @@ server_digest = bytes.fromhex(tsp_verification_data['submission_digest'])  # jus
 submission_bytes = str(tsp_verification_data['submission']).encode("utf-8")
 current_digest = hashlib.sha512(submission_bytes).digest()
 
-assert current_digest == server_digest, ("Digest mismatch. Digest computed from "
- "submission data does not match the digest in the verification data. Check if "
- "the verification data is correct. Submit again if you suspect tampering.")
-
-verified = TSPVerifier().verify(signature, message_digest=current_digest)
-
-print("Submission timestamp:", verified.tst_info["gen_time"].strftime("%Y-%m-%d, %H:%M:%S"))
-print(verified.signed_attrs)
-# If there is no DigestMismatchError returned, the verification is successful.
+try:
+    verified = TSPVerifier().verify(signature, message_digest=current_digest)
+    print("Submission timestamp:", verified.tst_info["gen_time"].strftime("%Y-%m-%d, %H:%M:%S"))
+    print(verified.signed_attrs)
+    print("Verification successful.")
+except Exception as e:
+    print("Verification failed:", e)
+    print("Consider re-uploading your submission.")
           </pre>
       </div>
     </div>

@@ -160,6 +160,12 @@ button[type="button"]:hover {
     border-color: #2a932b;
 }
 
+#copy-tsp-button {
+    background: #9e0c0c;
+    color: white;
+    /*border-color: none;*/
+}
+
 #copy-tsp-button.copied {
     background: #2a932b;
     color: white;
