@@ -163,7 +163,7 @@ def store_submission(submission: SubmissionSchema, signature: str, tsp_signature
         "team_name": submission.team_name,
         "contact_mail_address": submission.contact_mail_address,
         "time": timestamp,
-        "signature": signature,  # sha256 of tsp signature
+        "signature": signature,
         "tsp_signature": tsp_signature,
         "submission_digest": digest,
         "submission": submission.model_dump()["submission"],
@@ -177,16 +177,15 @@ def store_submission(submission: SubmissionSchema, signature: str, tsp_signature
 
 def process_submission(submission: SubmissionSchema) -> dict:
     """Generates a signature and stores the submission in the database."""
-    tsp_signature, digest, timestamp = sign_with_tsp_server(submission)
-    # signature = hashlib.sha256(tsp_signature.encode("utf-8")).hexdigest()  # TODO could also hash signature for higher privacy?
-    store_submission(submission, tsp_signature[:32], tsp_signature, digest, timestamp)
+    tsp_signature, submission_digest, timestamp = sign_with_tsp_server(submission)
+    signature = hashlib.sha256(tsp_signature.encode("utf-8")).hexdigest()[:64]  # TODO could also hash signature for higher privacy?
+    store_submission(submission, signature, tsp_signature, submission_digest, timestamp)
     return {
         "team_name": submission.team_name,
         "time": timestamp,
-        "signature": tsp_signature[:32],  # only publish first 32 characters
-        "tsp_verification_data": {"timestamp": timestamp, "digest": digest, "tsp_signature": tsp_signature,
+        "signature": signature,  # only publish first 64 characters
+        "tsp_verification_data": {"timestamp": timestamp, "submission_digest": submission_digest, "tsp_signature": tsp_signature,
                                   "submission": str(submission.model_dump())},
-        # "submission": submission.model_dump()["submission"],
     }
 
 

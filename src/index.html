@@ -232,7 +232,7 @@ if __name__ == "__main__":
 tsp_verification_data = {}
 
 signature = bytes.fromhex(tsp_verification_data['tsp_signature'])
-server_digest = bytes.fromhex(tsp_verification_data['digest'])
+server_digest = bytes.fromhex(tsp_verification_data['submission_digest'])  # just fyi
 
 submission_bytes = str(tsp_verification_data['submission']).encode("utf-8")
 current_digest = hashlib.sha512(submission_bytes).digest()
