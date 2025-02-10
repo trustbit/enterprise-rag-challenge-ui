@@ -1,0 +1,8 @@
+uvicorn
+fastapi
+requests
+tsp-client
+python-dotenv
+Jinja2
+pydantic
+python-multipart
