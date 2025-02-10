@@ -11,22 +11,26 @@ Specify necessary variables in the .env file and adapt to needs.
 
 
 ## Getting Started
-
-Install dependencies
+### Locally
+Install dependencies (preferably in a virtual environment)
 ```bash
-conda env create -f environment.yml
+pip install -r requirements.txt
 ```
 
-Activate the environment
-
-```bash
-conda activate rag-challenge-ui
-``` 
-
 Run the app
-
 ```bash
 python -m uvicorn src.main:app --reload
+```
+
+### With Docker
+Build docker image
+```bash
+docker build -t rag_challenge .
+```
+
+Run docker container
+```bash
+docker run -d -p 8000:8000 rag_challenge
 ```
 
 
