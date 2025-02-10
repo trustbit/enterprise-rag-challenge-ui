@@ -6,10 +6,13 @@ taking place on 27th of February 2025.
 
 ![UI_sample_image.png](UI_sample_image.png)
 
+## Before you start
+Specify necessary variables in the .env file and adapt to needs. 
+
+
 ## Getting Started
 
 Install dependencies
-
 ```bash
 conda env create -f environment.yml
 ```
@@ -25,6 +28,7 @@ Run the app
 ```bash
 python -m uvicorn src.main:app --reload
 ```
+
 
 ## Test submission with curl
 
