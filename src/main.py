@@ -73,10 +73,16 @@ def validate_answer(schema: Optional[str], answer: any) -> tuple[any, Optional[s
     if isinstance(answer, str) and answer.lower() in ["n/a", "na", "nan", ""]:
         return "n/a", None
     if schema == "number" and not isinstance(answer, (int, float)):
+        for convert_fn in (int, float):
+            try:
+                return convert_fn(answer), None
+            except ValueError:
+                continue
         try:
-            return float(answer), None
+            return float(answer.replace(",", ".")), None
         except ValueError:
-            return answer, f"Expected a number for schema 'number', got: '{answer}' ({type(answer).__name__})"
+            pass
+        return answer, f"Expected a number for schema 'number', got: '{answer}' ({type(answer).__name__})"
     if schema == "name" and not isinstance(answer, str):
         return answer, f"Expected text for schema 'name', got: '{answer}' ({type(answer).__name__})"
     if schema == "boolean":
