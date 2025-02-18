@@ -6,7 +6,12 @@
       "question_text": "What was the Net Profit Margin of \"Oesterreichische Kontrollbank\" in June 30, 2023?",
       "kind": "number",
       "value": 0.1243,
-      "references": []
+      "references": [
+        {
+            "pdf_sha1": "053b7cb83115789346e2a9efc7e2e640851653ff",
+            "page_index": 3
+        }
+      ]
     },
     {
       "question_text": "What was the total liabilities of \"CrossFirst Bank\" in the fiscal year 2023?",
