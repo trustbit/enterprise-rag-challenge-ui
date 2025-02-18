@@ -11,7 +11,6 @@ def main():
         "file": ("sample_answer.json", open(SUBMISSION_JSON_PATH, "rb"), "application/json")
     }
     response = requests.post(url, headers=headers, files=files)
-    assert response.status_code == 200
     print(response.json())
 
 
