@@ -1,3 +1,5 @@
+# FIXME NOT WORKING - NOT YET SUPPORTING RECENT SCHEMA CHANGES
+
 import json
 import pytest
 from fastapi.testclient import TestClient
