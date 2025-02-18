@@ -66,8 +66,8 @@
         <li>
           <strong>Upload multiple submissions (TODO DISCUSS)</strong>
           <ul>
-            <li>REPLACE old submission: use identical team name and e-mail address.</li>
-            <li>ADD another submission: change team name (e.g. add a "_2" at the end).</li>
+            <li>REPLACE old submission: use identical submission_name and team_email.</li>
+            <li>ADD another submission: change submission_name (e.g. add a "_2" at the end).</li>
           </ul>
         </li>
       </ol>
@@ -87,14 +87,14 @@
         <label for="content">Enter submission JSON:</label><br><br>
         <textarea id="content" name="content" rows="11">
 {
-"team_name": "test-team",
-"contact_mail_address": "test.team@rag-tat.com",
-"submission":
+"team_email": "test.team@rag-tat.com",
+"submission_name": "test-team",
+"answers":
     [
-      { "question": "Q1", "schema": "name", "answer": "A1" },
-      { "question": "Q2", "schema": "number", "answer": 2.5 },
-      { "question": "Q2", "schema": "boolean", "answer": true },
-      { "question": "Q2", "schema": "boolean", "answer": "n/a" }
+      { "question_text": "Q1", "kind": "name", "value": "A1", "references": []},
+      { "question_text": "Q2", "kind": "number", "value": 2.5, "references": []},
+      { "question_text": "Q2", "kind": "boolean", "value": true, "references": []},
+      { "question_text": "Q2", "kind": "boolean", "value": "n/a", "references": []}
     ]
 }</textarea><br><br>
         <button type="button" id="checkButton">Check Submission</button>
@@ -269,7 +269,7 @@ except Exception as e:
         <thead>
           <tr>
             <th>Time (UTC)</th>
-            <th>Team Name</th>
+            <th>Submission Name</th>
             <th>
               <span class="tooltip signature">
                 Signature

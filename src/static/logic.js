@@ -45,7 +45,7 @@
       row.appendChild(timeCell);
 
       const idCell = document.createElement("td");
-      idCell.textContent = entry.team_name;
+      idCell.textContent = entry.submission_name;
       row.appendChild(idCell);
 
       const sigCell = document.createElement("td");
@@ -139,19 +139,19 @@
         alert("Successfully submitted with issues!\n\nConsider submitting again adhering to the submission " +
             "guidelines. Use the identical team name and mail address to overwrite this submission. \n\n" +
             "Issues: " + result.issues.join("") + "\n\n" +
-            "Team: " + result.response.team_name + "\n\n" +
+            "Team: " + result.response.submission_name + "\n\n" +
             "Signature: " + result.response.signature + "\n\n"
         );
       } else if (result.status === "success") {
         alert("Submission successful!" + "\n\n" +
-            "Team: " + result.response.team_name + "\n\n" +
+            "Team: " + result.response.submission_name + "\n\n" +
             "Signature: " + result.response.signature + "\n\n"
         );
       }
       const successBanner = document.querySelector(".success-banner");
       successBanner.style.display = "block";
       const bannerSubmitData = document.querySelector("#submission-data")
-      bannerSubmitData.innerHTML = "Team: " + result.response.team_name + "<br>Signature: " + result.response.signature;
+      bannerSubmitData.innerHTML = "Team: " + result.response.submission_name + "<br>Signature: " + result.response.signature;
       const bannerSubmitTspData = document.querySelector("#tsp-verification-data")
       bannerSubmitTspData.textContent = JSON.stringify(result.response.tsp_verification_data);
 
