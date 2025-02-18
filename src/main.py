@@ -13,6 +13,7 @@ from tsp_client import TSPSigner, TSPVerifier, SigningSettings
 from dotenv import load_dotenv
 
 # TODO set env variables!
+# TODO update URL in index.html to actual API domain
 
 app = FastAPI()
 load_dotenv()
