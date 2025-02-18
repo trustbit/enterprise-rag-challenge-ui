@@ -7,7 +7,10 @@ taking place on 27th of February 2025.
 ![UI_sample_image.png](UI_sample_image.png)
 
 ## Before you start
-Specify necessary variables in the .env file and adapt to needs. 
+Specify necessary variables in the [`.env`](.env) file and adapt to needs.
+
+Adapt URL in [index.html](src/index.html) to actual API domain.
+
 
 
 ## Getting Started
