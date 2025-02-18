@@ -67,13 +67,13 @@ def validate_answer_item(submission: AnswerSubmission) -> tuple[list, list]:
         submitted_question = re.sub(r'[^A-Za-z0-9\s]', '', submission_item.question_text.lower())
         if true_question != submitted_question:
             issues_questions.append(
-                f"\n - Submission item {idx}: Question mismatch: '{submission_item.question_text}' != '{true_item['question_text']}'")
+                f"\n - Answer index {idx}: Question mismatch: '{submission_item.question_text}' != '{true_item['question_text']}'")
 
         true_kind = true_item["kind"]
         submitted_kind = submission_item.kind
         if true_kind != submitted_kind:
             issues_kind.append(
-                f"\n - Submission item {idx}: Kind mismatch: '{submission_item.kind}' != '{true_item['kind']}'")
+                f"\n - Answer index {idx}: Kind mismatch: '{submission_item.kind}' != '{true_item['kind']}'")
 
     return issues_questions, issues_kind
 
@@ -131,7 +131,7 @@ def validate_submission(submission: AnswerSubmission) -> list:
         corrected_value, issue = validate_answer(item.kind, item.value)
         submission.answers[idx].value = corrected_value
         if issue:
-            issue = f"\n - Submission item {idx}: {issue}"
+            issue = f"\n - Answer index {idx}: {issue}"
             issues_answers.append(issue)
 
     if len(issues_answers) > 3:
