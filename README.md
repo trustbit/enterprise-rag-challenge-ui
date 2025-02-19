@@ -76,30 +76,27 @@ pytest
 
 ```json
 {
-  "team_name": "xy",
-  "contact_mail_address": "xy@test.com",
-  "submissions": [
+  "team_email": "test@rag-tat.com",
+  "submission_name": "test-team",
+  "answers": [
     {
-      "question": "Q1",
-      "schema": "name",
-      "answer": "A1"
+      "question_text": "What was the Net Profit Margin of \"Oesterreichische Kontrollbank\" in June 30, 2023?",
+      "kind": "number",
+      "value": 0.1243,
+      "references": [
+        {
+            "pdf_sha1": "053b7cb83115789346e2a9efc7e2e640851653ff",
+            "page_index": 3
+        }
+      ]
     },
     {
-      "question": "Q2",
-      "schema": "number",
-      "answer": 2.5
+      "question_text": "What was the total liabilities of \"CrossFirst Bank\" in the fiscal year 2023?",
+      "kind": "number",
+      "value": 5992487000,
+      "references": []
     },
-    {
-      "question": "Q2",
-      "schema": "boolean",
-      "answer": true
-    },
-    {
-      "question": "Q2",
-      "schema": "boolean",
-      "answer": "n/a"
-    },
-    ...
+    
   ]
 }
 ```
