@@ -21,6 +21,8 @@ DEV = os.getenv("DEVELOPMENT")
 
 if DEV:
     logger = logging.getLogger(__name__)
+    if not os.path.exists('temp'):
+        os.makedirs('temp')
     logging.basicConfig(filename='temp/debug.log', encoding='utf-8', level=logging.INFO)
 
 app.mount("/static", StaticFiles(directory="src/static"), name="static")
@@ -32,21 +34,24 @@ with open(os.getenv("CORRECT_QUESTIONS_PATH"), "r", encoding="utf-8") as f:
 
 class SourceReference(BaseModel):
     model_config = ConfigDict(extra='ignore')
+
     pdf_sha1: str = Field(..., description="SHA1 hash of the PDF file")
     page_index: int = Field(..., description="Physical page number in the PDF file")
 
 
 class Answer(BaseModel):
     model_config = ConfigDict(extra='ignore')
-    question_text: str = Field(..., description="Text of the question")  # TODO optional?
-    kind: Literal["number", "name", "boolean", "names"] = Field(..., description="Kind of the question")
+
+    question_text: Optional[str] = Field(None, description="Text of the question")
+    kind: Optional[Literal["number", "name", "boolean", "names"]] = Field(None, description="Kind of the question")
     value: Union[float, str, bool, List[str], Literal["N/A"]] = (
-        Field(..., description="Answer to the question, according to the question schema"))  # TODO optional?
+        Field(..., description="Answer to the question, according to the question schema"))
     references: List[SourceReference] = Field([], description="References to the source material in the PDF file")
 
 
 class AnswerSubmission(BaseModel):
     model_config = ConfigDict(extra='ignore')
+
     team_email: str = Field(..., description="Email that your team used to register for the challenge")
     submission_name: str = Field(..., description="Unique name of the submission (e.g. experiment name)")
     answers: List[Answer] = Field(...,
@@ -62,27 +67,42 @@ def is_valid_email(email: str) -> bool:
 def validate_answer_item(submission: AnswerSubmission) -> tuple[list, list]:
     issues_questions = []
     issues_kind = []
-    for idx, (true_item, submission_item) in enumerate(zip(true_questions["answers"], submission.answers)):
-        true_question = re.sub(r'[^A-Za-z0-9\s]', '', true_item["question_text"].lower())
-        submitted_question = re.sub(r'[^A-Za-z0-9\s]', '', submission_item.question_text.lower())
-        if true_question != submitted_question:
-            issues_questions.append(
-                f"\n - Answer index {idx}: Question mismatch: '{submission_item.question_text}' != '{true_item['question_text']}'")
+    questions_missing, kinds_missing = False, False
+    for idx, (true_item, submission_item) in enumerate(zip(true_questions, submission.answers)):
+        if submission_item.question_text:
+            true_question = re.sub(r'[^A-Za-z0-9\s]', '', true_item["text"].lower())
+            submitted_question = re.sub(r'[^A-Za-z0-9\s]', '', submission_item.question_text.lower())
+            if true_question != submitted_question:
+                issues_questions.append(
+                    f"\n - Question mismatch (index {idx}): '{submission_item.question_text}' != '{true_item['text']}'")
+        else:
+            questions_missing = True
 
-        true_kind = true_item["kind"]
-        submitted_kind = submission_item.kind
-        if true_kind != submitted_kind:
-            issues_kind.append(
-                f"\n - Answer index {idx}: Kind mismatch: '{submission_item.kind}' != '{true_item['kind']}'")
+        # if submission_item.kind:
+        #     true_kind = true_item["kind"]
+        #     submitted_kind = submission_item.kind
+        #     if true_kind != submitted_kind:
+        #         issues_kind.append(
+        #             f"\n - Kind mismatch (index {idx}): '{submission_item.kind}' != '{true_item['kind']}'")
+        # else:
+        #     kinds_missing = True
+
+    if questions_missing:
+        issues_questions.insert(0, "\n - Missing question_text. To validate that answers are in correct order like in "
+                                "questions.json and aligned with correct answers, consider also adding 'question_text' "
+                                "to the answer items.")
+    # if kinds_missing:
+    #     issues_kind.append("\n - Missing kind. To validate answers kind corresponding to questions, consider "
+    #                        "also adding 'kind' to the answer items.")
 
     return issues_questions, issues_kind
 
 
-def validate_answer(kind: Optional[str], answer: any) -> tuple[any, Optional[str]]:
+def validate_answer(kind: str, answer: any) -> tuple[any, Optional[str]]:
     if answer is None:
-        return "n/a", None
+        return "N/A", None
     if isinstance(answer, str) and answer.lower() in ["n/a", "na", "nan", ""]:
-        return "n/a", None
+        return "N/A", None
     if kind == "number" and not isinstance(answer, (int, float)):
         for convert_fn in (int, float):
             try:
@@ -109,6 +129,7 @@ def validate_answer(kind: Optional[str], answer: any) -> tuple[any, Optional[str
 def validate_submission(submission: AnswerSubmission) -> list:
     issues_questions = []
     issues_kind = []
+    k_issues_to_show = 2
     if DEV: logger.info(f"CHECK_QUESTIONS: {os.getenv('CHECK_QUESTIONS')}")
 
     # checking email address
@@ -119,24 +140,24 @@ def validate_submission(submission: AnswerSubmission) -> list:
 
     if os.getenv("CHECK_QUESTIONS") == "True":
         issues_questions, issues_kind = validate_answer_item(submission)
-        if len(issues_questions) > 3:
-            issues_questions = issues_questions[:3] + [
-                f"\n - ... and {len(issues_questions) - 3} more question issue(s)"]
-        if len(issues_kind) > 3:
-            issues_kind = issues_kind[:3] + [
-                f"\n - ... and {len(issues_kind) - 3} more kind issue(s)"]
+        if len(issues_questions) > k_issues_to_show:
+            issues_questions = issues_questions[:k_issues_to_show] + [
+                f"\n - ... and {len(issues_questions) - k_issues_to_show} more question mismatches"]
+        if len(issues_kind) > k_issues_to_show:
+            issues_kind = issues_kind[:k_issues_to_show] + [
+                f"\n - ... and {len(issues_kind) - k_issues_to_show} more kind mismatches"]
 
     issues_answers = []
-    for idx, item in enumerate(submission.answers):
-        corrected_value, issue = validate_answer(item.kind, item.value)
+    for idx, (true_item, submission_item) in enumerate(zip(true_questions, submission.answers)):
+        corrected_value, issue = validate_answer(true_item["kind"], submission_item.value)
         submission.answers[idx].value = corrected_value
         if issue:
             issue = f"\n - Answer index {idx}: {issue}"
             issues_answers.append(issue)
 
-    if len(issues_answers) > 3:
-        issues_answers = issues_answers[:3] + [
-            f"\n - ... and {len(issues_answers) - 3} more answer issue(s)"]
+    if len(issues_answers) > k_issues_to_show:
+        issues_answers = issues_answers[:k_issues_to_show] + [
+            f"\n - ... and {len(issues_answers) - k_issues_to_show} more answer issue(s)"]
 
     return issue_email + issues_questions + issues_kind + issues_answers
 
