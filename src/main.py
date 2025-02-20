@@ -69,8 +69,8 @@ def validate_answer_item(submission: AnswerSubmission) -> tuple[list, list]:
     questions_missing, kinds_missing = False, False
     for idx, (true_item, submission_item) in enumerate(zip(true_questions, submission.answers)):
         if submission_item.question_text:
-            true_question = re.sub(r'[^A-Za-z0-9\s]', '', true_item["text"].lower())
-            submitted_question = re.sub(r'[^A-Za-z0-9\s]', '', submission_item.question_text.lower())
+            true_question = re.sub(r'[^A-Za-z0-9]', '', true_item["text"].lower())
+            submitted_question = re.sub(r'[^A-Za-z0-9]', '', submission_item.question_text.lower())
             if true_question != submitted_question:
                 issues_questions.append(
                     f"\n - Question mismatch (index {idx}): '{submission_item.question_text}' != '{true_item['text']}'")
