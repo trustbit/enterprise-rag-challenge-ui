@@ -100,9 +100,9 @@ def validate_answer_item(submission: AnswerSubmission) -> tuple[list, list]:
 
 def validate_answer(kind: Optional[str], answer: any) -> tuple[any, Optional[str]]:
     if answer is None:
-        return "n/a", None
+        return "N/A", None
     if isinstance(answer, str) and answer.lower() in ["n/a", "na", "nan", ""]:
-        return "n/a", None
+        return "N/A", None
     if kind == "number" and not isinstance(answer, (int, float)):
         for convert_fn in (int, float):
             try:
