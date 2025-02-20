@@ -21,6 +21,8 @@ DEV = os.getenv("DEVELOPMENT")
 
 if DEV:
     logger = logging.getLogger(__name__)
+    if not os.path.exists('temp'):
+        os.makedirs('temp')
     logging.basicConfig(filename='temp/debug.log', encoding='utf-8', level=logging.INFO)
 
 app.mount("/static", StaticFiles(directory="src/static"), name="static")
