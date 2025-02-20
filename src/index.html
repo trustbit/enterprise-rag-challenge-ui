@@ -53,7 +53,7 @@
             <li>Use the manual submission form below, or</li>
             <li>Submit via the API.</li>
             <li>Your submission will be timestamped using <a href="https://github.com/pyauth/tsp-client" target="_blank">TSP</a>.
-              To verify, store the full verification data via API response or button on top after UI submission.
+              To verify, store the full verification data of the API response or via button after UI submission.
             </li>
           </ul>
         </li>
@@ -61,11 +61,13 @@
           <strong>Verify Submission with TSP</strong>
           <ul>
             <li>Use the provided code snippet to verify your submission after uploading.</li>
+            <li>Make sure to store the tcp_verification_data from the UI or API response.</li>
           </ul>
         </li>
         <li>
-          <strong>Upload multiple submissions (TODO DISCUSS)</strong>
+          <strong>Upload multiple submissions (TBD)</strong>
           <ul>
+            <li>First submission counts for main leaderboard</li>
             <li>REPLACE old submission: use identical submission_name and team_email.</li>
             <li>ADD another submission: change submission_name (e.g. add a "_2" at the end).</li>
           </ul>
@@ -91,10 +93,9 @@
 "submission_name": "test-team",
 "answers":
     [
-      { "question_text": "Q1", "kind": "name", "value": "A1", "references": []},
-      { "question_text": "Q2", "kind": "number", "value": 2.5, "references": []},
-      { "question_text": "Q2", "kind": "boolean", "value": true, "references": []},
-      { "question_text": "Q2", "kind": "boolean", "value": "n/a", "references": []}
+      { "value": "2", "references": [{"pdf_sha1": "053b7cb83115789346e2a9efc7e2e640851653ff", "page_index": 3}]},
+      { "value": 2.5, "references": []},
+      { "value": "no", "references": []}
     ]
 }</textarea><br><br>
         <button type="button" id="checkButton">Check Submission</button>
@@ -218,7 +219,7 @@ if __name__ == "__main__":
     </button>
     <div class="section-content hidden">
       <p>Make sure to copy the verification data either with the button at the top when submitted via UI or from
-        the terminal if submitted via API!</p>
+        the API response!</p>
       <p>With Python (requires <a href="https://github.com/pyauth/tsp-client" target="_blank">tsp-client</a> library):
       </p>
       <div class="code-container">
