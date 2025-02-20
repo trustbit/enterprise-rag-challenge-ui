@@ -67,18 +67,33 @@ def is_valid_email(email: str) -> bool:
 def validate_answer_item(submission: AnswerSubmission) -> tuple[list, list]:
     issues_questions = []
     issues_kind = []
-    for idx, (true_item, submission_item) in enumerate(zip(true_questions["answers"], submission.answers)):
-        true_question = re.sub(r'[^A-Za-z0-9\s]', '', true_item["question_text"].lower())
-        submitted_question = re.sub(r'[^A-Za-z0-9\s]', '', submission_item.question_text.lower())
-        if true_question != submitted_question:
-            issues_questions.append(
-                f"\n - Answer index {idx}: Question mismatch: '{submission_item.question_text}' != '{true_item['question_text']}'")
+    questions_missing, kinds_missing = False, False
+    for idx, (true_item, submission_item) in enumerate(zip(true_questions, submission.answers)):
+        if submission_item.question_text:
+            true_question = re.sub(r'[^A-Za-z0-9\s]', '', true_item["text"].lower())
+            submitted_question = re.sub(r'[^A-Za-z0-9\s]', '', submission_item.question_text.lower())
+            if true_question != submitted_question:
+                issues_questions.append(
+                    f"\n - Question mismatch (index {idx}): '{submission_item.question_text}' != '{true_item['text']}'")
+        else:
+            questions_missing = True
 
-        true_kind = true_item["kind"]
-        submitted_kind = submission_item.kind
-        if true_kind != submitted_kind:
-            issues_kind.append(
-                f"\n - Answer index {idx}: Kind mismatch: '{submission_item.kind}' != '{true_item['kind']}'")
+        # if submission_item.kind:
+        #     true_kind = true_item["kind"]
+        #     submitted_kind = submission_item.kind
+        #     if true_kind != submitted_kind:
+        #         issues_kind.append(
+        #             f"\n - Kind mismatch (index {idx}): '{submission_item.kind}' != '{true_item['kind']}'")
+        # else:
+        #     kinds_missing = True
+
+    if questions_missing:
+        issues_questions.insert(0, "\n - Missing question_text. To validate that answers are in correct order like in "
+                                "questions.json and aligned with correct answers, consider also adding 'question_text' "
+                                "to the answer items.")
+    # if kinds_missing:
+    #     issues_kind.append("\n - Missing kind. To validate answers kind corresponding to questions, consider "
+    #                        "also adding 'kind' to the answer items.")
 
     return issues_questions, issues_kind
 
