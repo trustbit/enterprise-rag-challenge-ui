@@ -98,7 +98,7 @@ def validate_answer_item(submission: AnswerSubmission) -> tuple[list, list]:
     return issues_questions, issues_kind
 
 
-def validate_answer(kind: Optional[str], answer: any) -> tuple[any, Optional[str]]:
+def validate_answer(kind: str, answer: any) -> tuple[any, Optional[str]]:
     if answer is None:
         return "N/A", None
     if isinstance(answer, str) and answer.lower() in ["n/a", "na", "nan", ""]:
@@ -129,6 +129,7 @@ def validate_answer(kind: Optional[str], answer: any) -> tuple[any, Optional[str
 def validate_submission(submission: AnswerSubmission) -> list:
     issues_questions = []
     issues_kind = []
+    k_issues_to_show = 2
     if DEV: logger.info(f"CHECK_QUESTIONS: {os.getenv('CHECK_QUESTIONS')}")
 
     # checking email address
@@ -139,24 +140,24 @@ def validate_submission(submission: AnswerSubmission) -> list:
 
     if os.getenv("CHECK_QUESTIONS") == "True":
         issues_questions, issues_kind = validate_answer_item(submission)
-        if len(issues_questions) > 3:
-            issues_questions = issues_questions[:3] + [
-                f"\n - ... and {len(issues_questions) - 3} more question issue(s)"]
-        if len(issues_kind) > 3:
-            issues_kind = issues_kind[:3] + [
-                f"\n - ... and {len(issues_kind) - 3} more kind issue(s)"]
+        if len(issues_questions) > k_issues_to_show:
+            issues_questions = issues_questions[:k_issues_to_show] + [
+                f"\n - ... and {len(issues_questions) - k_issues_to_show} more question mismatches"]
+        if len(issues_kind) > k_issues_to_show:
+            issues_kind = issues_kind[:k_issues_to_show] + [
+                f"\n - ... and {len(issues_kind) - k_issues_to_show} more kind mismatches"]
 
     issues_answers = []
-    for idx, item in enumerate(submission.answers):
-        corrected_value, issue = validate_answer(item.kind, item.value)
+    for idx, (true_item, submission_item) in enumerate(zip(true_questions, submission.answers)):
+        corrected_value, issue = validate_answer(true_item["kind"], submission_item.value)
         submission.answers[idx].value = corrected_value
         if issue:
             issue = f"\n - Answer index {idx}: {issue}"
             issues_answers.append(issue)
 
-    if len(issues_answers) > 3:
-        issues_answers = issues_answers[:3] + [
-            f"\n - ... and {len(issues_answers) - 3} more answer issue(s)"]
+    if len(issues_answers) > k_issues_to_show:
+        issues_answers = issues_answers[:k_issues_to_show] + [
+            f"\n - ... and {len(issues_answers) - k_issues_to_show} more answer issue(s)"]
 
     return issue_email + issues_questions + issues_kind + issues_answers
 
