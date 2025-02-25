@@ -16,19 +16,19 @@ def valid_submission_json():
         "submission_name": "test-team",
         "answers": [
             {
-                "question_text": "What was the Net Profit Margin of \"Oesterreichische Kontrollbank\" in June 30, 2023?",
+                "question_text": "According to the annual report, what is the Operating margin (%) for Altech Chemicals Ltd  (within the last period or at the end of the last period)? If data is not available, return 'N/A'.",
                 "kind": "number",
                 "value": 0.1243,
-                "references": []
+                "references": [{"pdf_sha1": "053b7cb83115789346e2a9efc7e2e640851653ff", "page_index": 3}]
             },
             {
-                "question_text": "What was the total liabilities of \"CrossFirst Bank\" in the fiscal year 2023?",
+                "question_text": "According to the annual report, what is the Operating margin (%) for Cofinimmo  (within the last period or at the end of the last period)? If data is not available, return 'N/A'.",
                 "kind": "number",
                 "value": 5992487000,
-                "references": []
+                "references": [{"pdf_sha1": "053b7cb83115789346e2a9efc7e2e640851653ff", "page_index": 8}]
             },
             {
-                "question_text": "How much more did \"Astral Resources NL\" spend on marketing compared to \"TSX_Y\" in June 30, 2021?",
+                "question_text": "Did Cofinimmo outline any new ESG initiatives in the annual report?",
                 "kind": "number",
                 "value": "N/A",
                 "references": []
@@ -148,8 +148,7 @@ def test_check_submission_invalid_email(valid_submission_json):
                         json.dumps(invalid_email_submission),
                         "application/json")}
     )
-    print("######")
-    print(response.json())
+
     assert response.status_code == 200
     data = response.json()
     assert data["status"] == "issues found"
