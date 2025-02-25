@@ -5,9 +5,9 @@
   <title>RAG Challenge Submission API</title>
   <link rel="icon" type="image/x-icon" href="static/assets/fav_ttg.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap"
-        rel="stylesheet">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="anonymous">
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@100;200;300;400;500;600;700;800;900&family=Poppins:wght@100;200;300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+
   <link rel="stylesheet" href="static/style.css">
 </head>
 <body>
@@ -27,27 +27,40 @@
 
 <div class="content">
   <h1>Enterprise RAG Challenge</h1>
-  <p>This is a firendly competition to build RAG system that can read annual reports and answer questions.</p>
-  <ol>
-    <li>
-      <a href="https://www.timetoact-group.at/details/enterprise-rag-challenge">Read more</a> and <a href="https://www.timetoact-group.at/details/enterprise-rag-challenge#sign-up">register</a>.
-    </li>
-    <li><b>Optional</b>: <a href="https://rag.timetoact.at/data/r2.0-test/">Download sample questions and data</a>.
-    </li>
-    <li>
 
-      <a href="https://github.com/trustbit/enterprise-rag-challenge/tree/main?tab=readme-ov-file#schema">Read more about submission format</a>
-    </li>
-    <li><b>Optional</b>: <a href="https://github.com/trustbit/enterprise-rag-challenge/blob/main/main.py">Study source code of the question generator</a>.</li>
-    <li>
-      <b>Optional</b>: Generate your own test submission JSON and submit it below for a test.
-    </li>
-    <li>Join us on February 27th at 10:00 UTC+1 on <a href="https://discord.gg/ZhtnBmta">Discord</a> for challenge data. It will be uploaded <a href="https://rag.timetoact.at/data/r2.0/">here</a>.</li>
-    <li>Submit your competition submission and fill in the questionnarie (link will be provided, anonymous participation is allowed).</li>
-  </ol>
-  <p>Multiple submissions from a team are allowed. Only the first submission counts for the prizes, but all submissions with questionnarie go to the leaderboard.</p>
+  <div class="collapsible-section">
+    <button class="section-header">
+      <svg class="arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M6 9l6 6 6-6" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+      <h2>Introduction</h2>
+    </button>
+    <div class="section-content" id="intro-text">
 
+      <p>This is a friendly competition to build a RAG system that can read annual reports and answer questions.</p>
+      <ul>
+        <li><a href="https://www.timetoact-group.at/details/enterprise-rag-challenge" target="_blank">Overview page</a> of challenge</li>
+        <li><a href="https://www.timetoact-group.at/details/enterprise-rag-challenge#sign-up" target="_blank">Registration</a></li>
+        <li><a href="https://github.com/trustbit/enterprise-rag-challenge/tree/main?tab=readme-ov-file#schema" target="_blank">Submission format description</a></li>
+        <li><i>Optional but recommended</i>:
+          <ul>
+            <li><a href="https://rag.timetoact.at/data/r2.0-test/" target="_blank">Download</a> sample questions and data.</li>
+          </ul>
+          <ul>
+            <li>Study <a href="https://github.com/trustbit/enterprise-rag-challenge/blob/main/main.py" target="_blank">source code</a> of the question generator.</li>
+          </ul>
+          <ul>
+            <li>Generate your own test submission JSON and submit it below for a test.</li>
+          </ul>
+        </li>
 
+        <li>Join us on February 27th at 10:00 UTC+1 on <a href="https://discord.gg/ZhtnBmta" target="_blank">Discord</a> for challenge data. It will be uploaded <a href="https://rag.timetoact.at/data/r2.0/" target="_blank">here</a>.</li>
+        <li>Upload your competition submission and fill in the questionnaire (link will be provided, anonymous participation is allowed).</li>
+        <li>Multiple submissions from a team are allowed. Only the first submission counts for the prizes, but all submissions with questionnaire go to the leaderboard.</li>
+      </ul>
+
+    </div>
+  </div>
 
 
   <!-- Instructions -->
@@ -58,19 +71,19 @@
       </svg>
       <h2>Submission Instructions</h2>
     </button>
-    <div class="section-content" id="intro-text">
+    <div class="section-content" id="instructions-text">
       <ol>
         <li>
-          <strong>Adhere to the <a href="https://github.com/trustbit/enterprise-rag-challenge/tree/main?tab=readme-ov-file#schema" target="_blank">Submission Guidelines</a></strong>
+          <b>Adhere to the <a href="https://github.com/trustbit/enterprise-rag-challenge/tree/main?tab=readme-ov-file#schema" target="_blank">Submission Guidelines</a></b>
         </li>
         <li>
-          <strong>Check Your Submission</strong>
+          <b>Check Your Submission</b>
           <ul>
             <li>Validate your submission format for any issues that could impact scoring.</li>
           </ul>
         </li>
         <li>
-          <strong>Submit Answers</strong>
+          <b>Submit Answers</b>
           <ul>
             <li>Use the manual submission form below, or</li>
             <li>Submit via the API.</li>
@@ -80,18 +93,18 @@
           </ul>
         </li>
         <li>
-          <strong>Verify Submission with TSP</strong>
+          <b>Verify Submission with TSP</b>
           <ul>
             <li>Use the provided code snippet to verify your submission after uploading.</li>
             <li>Make sure to store the tcp_verification_data from the UI or API response.</li>
           </ul>
         </li>
         <li>
-          <strong>Upload multiple submissions (TBD)</strong>
+          <b>Upload multiple submissions</b>
           <ul>
-            <li>First submission counts for main leaderboard</li>
+            <li>First submission counts for main leaderboard.</li>
             <li>REPLACE old submission: use identical submission_name and team_email.</li>
-            <li>ADD another submission: change submission_name (e.g. add a give different experiment name).</li>
+            <li>ADD another submission: change submission_name.</li>
           </ul>
         </li>
       </ol>
@@ -159,7 +172,7 @@ curl -X 'POST' \
         <pre id="python-code-check">
 import requests
 
-SUBMISSION_JSON_PATH = r"test\samples\sample_answer.json"
+SUBMISSION_JSON_PATH = "test/samples/sample_answer.json"
 
 def main():
     url = "https://rag.timetoact.at/check-submission"
@@ -212,7 +225,7 @@ curl -X 'POST' \
         <pre id="python-code-submit">
 import requests
 
-SUBMISSION_JSON_PATH = r"test\samples\sample_answer.json"
+SUBMISSION_JSON_PATH = "test/samples/sample_answer.json"
 
 def main():
     url = "https://rag.timetoact.at/submit"
