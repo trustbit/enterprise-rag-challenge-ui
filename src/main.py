@@ -55,7 +55,7 @@ class AnswerSubmission(BaseModel):
     submission_name: str = Field(..., description="Unique name of the submission (e.g. experiment name)")
     answers: List[Answer] = Field(...,
                                   description="List of answers to the questions",
-                                  max_length=int(os.getenv("MAX_NR_OF_QUESTIONS")))
+                                  max_length=100)
 
 
 def is_valid_email(email: str) -> bool:
