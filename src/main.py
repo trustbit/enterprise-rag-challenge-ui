@@ -103,11 +103,18 @@ def validate_answer(kind: str, answer: any) -> tuple[any, Optional[str]]:
     if isinstance(answer, str) and answer.lower() in ["n/a", "na", "nan", ""]:
         return "N/A", None
     if kind == "number" and not isinstance(answer, (int, float)):
+
+        # conversion subjects are string or bytes-like
+        is_convertible = isinstance(answer, (str, bytes))
+        if not is_convertible:
+            return answer, f"Expected a number for kind 'number', got: '{answer}' ({type(answer).__name__})"
+
         for convert_fn in (int, float):
             try:
                 return convert_fn(answer), None
             except ValueError:
                 continue
+
         try:
             return float(answer.replace(",", ".")), None
         except ValueError:
