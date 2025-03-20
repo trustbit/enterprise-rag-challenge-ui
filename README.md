@@ -1,8 +1,10 @@
 # Enterprise RAG Challenge UI & Submission Handling
 
-Codebase for the Submission API and UI for the TIMETOACT 
-[Enterprise RAG Challenge](https://www.timetoact-group.at/details/enterprise-rag-challenge) 
-taking place on 27th of February 2025.
+Codebase for the Submission API and UI for the TIMETOACT Enterprise RAG Challenge taking place on 27th of February 2025.
+
+[Landing page](https://www.timetoact-group.at/details/enterprise-rag-challenge)
+
+[Source code](https://github.com/trustbit/enterprise-rag-challenge/)
 
 ![UI_sample_image.png](UI_sample_image.png)
 
