@@ -104,6 +104,9 @@ th {
 td {
     font-size: 0.8rem;
     font-family: monospace;
+    white-space:nowrap;
+    overflow:hidden;
+    text-overflow:ellipsis;
 }
 
 textarea {
@@ -267,4 +270,16 @@ button[type="button"]:hover {
 .tooltip:hover .tooltiptext {
     visibility: visible;
     opacity: 1;
+}
+
+#submissionsTable {
+  table-layout: fixed;
+  width: 100%; /* or any specific width you prefer */
+}
+
+#submissionsTable td,
+#submissionsTable th {
+  overflow: hidden;
+  text-overflow: ellipsis; /* optional, for an ellipsis effect */
+  white-space: nowrap;     /* prevents line breaks */
 }

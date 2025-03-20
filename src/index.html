@@ -8,7 +8,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="anonymous">
   <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@100;200;300;400;500;600;700;800;900&family=Poppins:wght@100;200;300;400;500;600;700;800;900&display=swap" rel="stylesheet">
 
-  <link rel="stylesheet" href="static/style.css">
+  <link rel="stylesheet" href="static/style.css?v=1">
 </head>
 <body>
 <div class="success-banner" id="successBanner">
@@ -33,18 +33,19 @@
       <svg class="arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
         <path d="M6 9l6 6 6-6" stroke-linecap="round" stroke-linejoin="round"/>
       </svg>
-      <h2>Introduction</h2>
+      <h2>Submission API - Experiment Tracking Server</h2>
     </button>
     <div class="section-content" id="intro-text">
 
       <p>This is a friendly competition to build a RAG system that can read annual reports and answer questions.</p>
+      <p><b>Update:</b> the competition part is over (<a href="https://www.timetoact-group.at/en/insights/the-winner-of-the-enterprise-rag-challenge">winner announcement</a>), but we are still running experiments! This experiment tracking server is guaranteed to run at least until April.</p>
       <ul>
         <li><a href="https://www.timetoact-group.at/details/enterprise-rag-challenge" target="_blank">Overview page</a> of challenge</li>
         <li><a href="https://www.timetoact-group.at/details/enterprise-rag-challenge#sign-up" target="_blank">Registration</a></li>
         <li><a href="https://github.com/trustbit/enterprise-rag-challenge/tree/main?tab=readme-ov-file#schema" target="_blank">Submission format description</a></li>
         <li><i>Optional but recommended</i>:
           <ul>
-            <li><a href="https://rag.timetoact.at/data/r2.0-test/" target="_blank">Download</a> sample questions and data.</li>
+            <li><a href="https://rag.abdullin.com/data/r2.0-test/" target="_blank">Download</a> sample questions and data.</li>
           </ul>
           <ul>
             <li>Study <a href="https://github.com/trustbit/enterprise-rag-challenge/blob/main/main.py" target="_blank">source code</a> of the question generator.</li>
@@ -54,8 +55,8 @@
           </ul>
         </li>
 
-        <li>Join us on February 27th at 10:00 UTC+1 on <a href="https://discord.gg/ZhtnBmta" target="_blank">Discord</a> for challenge data. It will be uploaded <a href="https://rag.timetoact.at/data/r2.0/" target="_blank">here</a>.</li>
-        <li>Upload your competition submission and fill in the questionnaire (link will be provided, anonymous participation is allowed).</li>
+        <li>Join us on February 27th at 10:00 AM UTC+1 on <a href="https://discord.gg/ZhtnBmta" target="_blank">Discord</a> for challenge data. It will be uploaded <a href="https://rag.abdullin.com/data/r2.0/" target="_blank">here</a>.</li>
+        <li>Upload your competition submission and <a href="https://tally.so/r/mDZO1Z">fill in the questionnaire</a>. Anonymous participation is allowed, but you still must fill in the form.</li>
         <li>Multiple submissions from a team are allowed. Only the first submission counts for the prizes, but all submissions with questionnaire go to the leaderboard.</li>
       </ul>
 
@@ -88,8 +89,9 @@
             <li>Use the manual submission form below, or</li>
             <li>Submit via the API.</li>
             <li>Your submission will be timestamped using <a href="https://github.com/pyauth/tsp-client" target="_blank">TSP</a>.
-              To verify, store the full verification data of the API response or via button after UI submission.
+              <b>Store the full verification data</b> of the API response or via button after UI submission.
             </li>
+            <li><b>Important!</b>Fill in a <a href="https://tally.so/r/mDZO1Z">short form on Tally</a> describing your submission. You will need to paste tsp_signature there.</li>
           </ul>
         </li>
         <li>
@@ -100,11 +102,17 @@
           </ul>
         </li>
         <li>
+          <b>Deadlines</b>
+          <ul>
+            <li><b>Prize deadline</b> - March 01, 00:00 UTC+1. Only submissions sent in February can be nominated for the prizes.</li>
+            <li><b>Leaderboard deadline</b> - March 07, 10:00 UTC+1. Only submissions sent before we release the answers are accepted.</li>
+          </ul>
+        </li>
+        <li>
           <b>Upload multiple submissions</b>
           <ul>
-            <li>First submission counts for main leaderboard.</li>
-            <li>REPLACE old submission: use identical submission_name and team_email.</li>
-            <li>ADD another submission: change submission_name.</li>
+            <li>Uploading multiple submissions with different architectures and approaches is encouraged! All submissions with a filled form will go to the primary leaderboard.</li>
+            <li>By default, the first submission from the team until the <b>prize deadline</b> (March 01, 00:00 UTC+1) is nominated for the prize. But until the deadline you can replace your nomination with a better but slower solution. Use <em>"Do you want to replace your previous prize submission?"</em> section in the form to do that.</li>
           </ul>
         </li>
       </ol>
@@ -157,7 +165,7 @@
         </button>
         <pre id="curl-code-check">
 curl -X 'POST' \
-  'https://rag.timetoact.at/check-submission' \
+  'https://rag.abdullin.com/check-submission' \
   -H 'accept: application/json' \
   -H 'Content-Type: multipart/form-data' \
   -F 'file=@test/samples/sample_answer.json;type=application/json'
@@ -175,7 +183,7 @@ import requests
 SUBMISSION_JSON_PATH = "test/samples/sample_answer.json"
 
 def main():
-    url = "https://rag.timetoact.at/check-submission"
+    url = "https://rag.abdullin.com/check-submission"
     headers = {"accept": "application/json"}
     files = {
         "file": ("sample_answer.json", open(SUBMISSION_JSON_PATH, "rb"), "application/json")
@@ -210,7 +218,7 @@ if __name__ == "__main__":
         </button>
         <pre id="curl-code-submit">
 curl -X 'POST' \
-  'https://rag.timetoact.at/submit' \
+  'https://rag.abdullin.com/submit' \
   -H 'accept: application/json' \
   -H 'Content-Type: multipart/form-data' \
   -F 'file=@test/samples/sample_answer.json;type=application/json'
@@ -228,7 +236,7 @@ import requests
 SUBMISSION_JSON_PATH = "test/samples/sample_answer.json"
 
 def main():
-    url = "https://rag.timetoact.at/submit"
+    url = "https://rag.abdullin.com/submit"
     headers = {"accept": "application/json"}
     files = {
         "file": ("sample_answer.json", open(SUBMISSION_JSON_PATH, "rb"), "application/json")
